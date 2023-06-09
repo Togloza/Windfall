@@ -25,7 +25,8 @@ contract WinnerCalculator is InterfaceImplementation, Access, Users {
     // Keep track of claimable rewards for the winners
     mapping(address => uint) public winnerRewards;
 
-
+    constructor(IWinToken _winTokenAddress) InterfaceImplementation(_winTokenAddress)
+    {}
 
 
     event winnerChosen(address winner, uint winningAmount);

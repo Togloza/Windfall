@@ -5,7 +5,7 @@ import "./IWinToken.sol";
 
 contract InterfaceImplementation is IWinToken{
 
-address winTokenAddress;
+IWinToken winTokenAddress;
 constructor(IWinToken _winTokenAddress)
 {
     require(address(_winTokenAddress) != address(0), "address 0");
