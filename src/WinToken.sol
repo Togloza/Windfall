@@ -3,6 +3,7 @@ pragma solidity ^0.8.0;
 
 import "@thirdweb-dev/contracts/base/ERC721Base.sol";
 import "./Access.sol";
+import "./IWinToken.sol";
 
 /* UNCOMMENT FOR TURNSTILE REWARDS
 interface Turnstile {
@@ -13,7 +14,7 @@ interface Turnstile {
 */
 
 
-contract WinToken is ERC721Base, Access  {
+contract WinToken is ERC721Base, Access, IWinToken  {
     // CSR rewards 
     /* UNCOMMENT FOR TURNSTILE REWARDS
     Turnstile immutable turnstile;
