@@ -50,7 +50,7 @@ contract WinToken is ERC721Base, Access, IWinToken  {
 
 
    
-    function MintTo(address _to, string memory _tokenURI) external virtual {
+    function MintTo(address _to, string memory _tokenURI) external virtual onlyRole(MINTER) {
         super.mintTo(_to, _tokenURI);
     }
 
@@ -62,7 +62,7 @@ contract WinToken is ERC721Base, Access, IWinToken  {
         return nextTokenIdToMint();
     }
      
-    function Burn(uint256 _tokenID) external virtual {
+    function Burn(uint256 _tokenID) external virtual onlyRole(MINTER) {
         burnedTokens[_tokenID] = true;
         super._burn(_tokenID, true);
     }

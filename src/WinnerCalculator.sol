@@ -50,6 +50,7 @@ contract WinnerCalculator is InterfaceImplementation, Access, Users {
 
     // Write function to update contract on winner and amount.
     function publishWinningAddress(address winnerAddress) external {
+        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender) || hasRole(SAFETY_ADDRESS, msg.sender) || hasRole(PUBLISHER, msg.sender));
         uint winningAmount; 
         if (dayCounter % 7 == 0){
             winningAmount = getWeeklyWinningAmount();
