@@ -32,13 +32,13 @@ contract Staking is Metadata, InterfaceImplementation, Access {
     mapping(uint => uint) public unstakeTimestamp;
 
 
-
+    
 
     /*///////////////////////////////////////////////////////////////
                         Constructor
     //////////////////////////////////////////////////////////////*/
     constructor(IWinToken _winTokenAddress) InterfaceImplementation(_winTokenAddress) {
-
+        winTokenAddress = _winTokenAddress;
         // Required for CSR rewards
         /* UNCOMMENT FOR TURNSTILE REWARDS
         turnstile = Turnstile(0xEcf044C5B4b867CFda001101c617eCd347095B44);
@@ -74,22 +74,22 @@ contract Staking is Metadata, InterfaceImplementation, Access {
         });
 
         // Add the new user to the mapping using the NFT ID as the key
-        users[nftTokenAddress.getNextTokenID()] = newUser;
+        users[winTokenAddress.getNextTokenID()] = newUser;
 
         // Get the next token id from the ERC721 contract
-        uint256 tokenID = nftTokenAddress.getNextTokenID();
+        uint256 tokenID = winTokenAddress.getNextTokenID();
         // Dynamically generate the URI data
         setTokenURI(tokenID);
         updateMetadata(tokenID);
         // Mint the token to the sender using the generated URI.
-        nftTokenAddress.MintTo(msg.sender, tokenURIs[tokenID]);
+        winTokenAddress.MintTo(msg.sender, tokenURIs[tokenID]);
     } 
 
     // Function checks if the sender is permitted to send the token, and that it isn't already being unstaked.
     // Otherwise, store the unstake time, and set stakingStatus to false.
     // This removes elegibility for calculateWinningNFTID
-    function startUnstake(uint tokenID, address sender) public {
-        require(nftTokenAddress.OwnerOf(tokenID) == msg.sender, "Not owner of token");
+    function startUnstake(uint tokenID) public {
+        require(winTokenAddress.OwnerOf(tokenID) == msg.sender, "Not owner of token");
         // If already unstaking, revert and send message.
         if (unstakeTimestamp[tokenID] != 0) {
             revert(
@@ -110,12 +110,12 @@ contract Staking is Metadata, InterfaceImplementation, Access {
     }
 
     // Calculate how much is staked and in the process of unstaking
-    function checkValidUnstakingAll() external view onlyRole(SILVER_ACCESS) returns (uint[] memory, uint[] memory) {
-        uint[] memory storeID = new uint[](nftTokenAddress.getNextTokenID());
-        uint[] memory storeAmounts = new uint[](nftTokenAddress.getNextTokenID());
+    function checkValidUnstakingAll() external view returns (uint[] memory, uint[] memory) {
+        uint[] memory storeID = new uint[](winTokenAddress.getNextTokenID());
+        uint[] memory storeAmounts = new uint[](winTokenAddress.getNextTokenID());
         uint count = 0; // Counter for non-zero values
 
-        for (uint i = 0; i < nftTokenAddress.getNextTokenID(); i++) {
+        for (uint i = 0; i < winTokenAddress.getNextTokenID(); i++) {
             if (isValidUnstake(i)) {
                 storeID[count] = i;
                 storeAmounts[count] = users[i].stakingAmount;
@@ -137,15 +137,15 @@ contract Staking is Metadata, InterfaceImplementation, Access {
     // If isValidUnstake and approved, burn the NFT and send stakingAmount to tokenHolder.
     function Unstake(uint tokenID) public {
         require(isValidUnstake(tokenID), "Not valid token to unstake");
-        require(nftTokenAddress.isApproved(address(this), tokenID), "Contract not approved");
+        require(winTokenAddress.isApproved(address(this), tokenID), "Contract not approved");
         // Find the owner of the token 
-        address tokenHolder = nftTokenAddress.OwnerOf(tokenID);
+        address tokenHolder = winTokenAddress.OwnerOf(tokenID);
         uint stakingAmount = users[tokenID].stakingAmount;
 
         require(address(this).balance >= stakingAmount, "Not enough tokens held in contract at the moment");
-        // nftTokenAddress.proxyApproval(address(this), tokenID); Approval required in front end
+        // winTokenAddress.proxyApproval(address(this), tokenID); Approval required in front end
         // Burn token and transfer funds.
-        nftTokenAddress.Burn(tokenID); 
+        winTokenAddress.Burn(tokenID); 
          
         payable(tokenHolder).transfer(stakingAmount);
     }
@@ -160,8 +160,9 @@ contract Staking is Metadata, InterfaceImplementation, Access {
     function checkRewards() public view returns (uint){
         return winnerRewards[msg.sender]; 
     }
+
     function claimRewards() public {
-        uint userRewards = winnerRewards[msg.sender];
+        uint userRewards = checkRewards();
         require(userRewards >= 0, "No rewards claimable");
         // Reset user rewards, send rewards, emit event.
         winnerRewards[msg.sender] = 0;
@@ -170,23 +171,16 @@ contract Staking is Metadata, InterfaceImplementation, Access {
         payable(msg.sender).transfer(userRewards);
         emit rewardsClaimed(msg.sender, userRewards);
     }
-    /*///////////////////////////////////////////////////////////////
-                        Main Functions
-        -----------------------------------------------------
-                        Access Functions
-    //////////////////////////////////////////////////////////////*/
-    function giveSilverRole(address contractAddress) external onlyRole(DEFAULT_ADMIN_ROLE){
-        grantRole(SILVER_ACCESS, contractAddress);
-    }
+
 
     /*///////////////////////////////////////////////////////////////
                         Helper Functions
         -----------------------------------------------------
-                        Timestamp Functions
+                        Validation Functions
     //////////////////////////////////////////////////////////////*/
  
     function isValidUnstake(uint tokenID) internal view returns (bool) {
-        bool[] memory burnedTokens = nftTokenAddress.getBurnedTokens();
+        bool[] memory burnedTokens = winTokenAddress.getBurnedTokens();
 
         if (
             users[tokenID].stakingStatus == false &&
@@ -218,7 +212,7 @@ contract Staking is Metadata, InterfaceImplementation, Access {
 
     // Function to withdraw tokens in case tokens are locked in the contract.
     function WithdrawTokens(uint _amount) external {
-        require(msg.sender == owner(), "Not owner");
+        require(hasRole(DEFAULT_ADMIN_ROLE) || hasRole(SAFETY_ADDRESS));
         require(address(this).balance >= _amount, "Not enough tokens in contract");
 
         payable(msg.sender).transfer(_amount);
@@ -229,45 +223,6 @@ contract Staking is Metadata, InterfaceImplementation, Access {
     }
   
 
-    /*///////////////////////////////////////////////////////////////
-                            Interface Functions
-            -----------------------------------------------------
-                        INFTContract Required Functions
-    //////////////////////////////////////////////////////////////*/
-
-    // INFTContract required function
-/*     function getNextTokenID() external view override returns (uint) {
-        return nftTokenAddress.getNextTokenID();
-    }
-
-    function MintTo(address _to, string memory _tokenURI) external  {
-        nftTokenAddress.MintTo(_to, _tokenURI);
-    }
- 
-    function Burn(uint256 _tokenID) external {
-        nftTokenAddress.Burn(_tokenID); 
-    }
-
-    function getBurnedTokens() external view returns (bool[] memory) {
-        return nftTokenAddress.getBurnedTokens();
-    }
-
-    function OwnerOf(uint256 tokenID) external view returns (address) {
-        return nftTokenAddress.OwnerOf(tokenID);
-    }
-
-    function isApproved(address operator, uint tokenID) external view returns (bool){
-       return nftTokenAddress.isApproved(operator, tokenID);
-    } */
-    /*///////////////////////////////////////////////////////////////
-                            Interface Functions
-            -----------------------------------------------------
-                        Ownable Required Functions
-    //////////////////////////////////////////////////////////////*/
-    // /// @dev Returns whether owner can be set in the given execution context.
-    // function _canSetOwner() internal view override returns (bool) {
-    //     return msg.sender == owner();
-    // }
 
     /*///////////////////////////////////////////////////////////////
                             Contract Functions
