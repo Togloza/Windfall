@@ -8,14 +8,17 @@ import "./Staking.sol";
 import "./Access.sol";
 
 
-contract FactoryContract {
+contract WindfallFactory {
 
 
     WinToken public winToken;
     IWinToken public tokenContract;
     WinnerCalculator public winnerCalculator;
     Staking public staking;
+    Access public access;
 
+
+    
 
     constructor(
         string memory _name,
@@ -28,8 +31,32 @@ contract FactoryContract {
         tokenContract = IWinToken(winToken);
         winnerCalculator = new WinnerCalculator(tokenContract);
         staking = new Staking(tokenContract);
+
+        access = new Access();
+        access.giveMintRole(address(staking));
+        
+        
         
     }
 
+    function isReadyToDraw() public view returns (bool) {
+        return winnerCalculator.isReadyToDraw();
+    }
+
+    function isWeekReward() public view returns (bool) {
+        return winnerCalculator.isWeekReward();
+    }
+    
+    function publishWinner() public {
+        (address winnerAddress, ) = winnerCalculator.findWinningNFTAddress();
+        winnerCalculator.publishWinningAddress(winnerAddress);
+    }
+
+
+
+    function getStakingContractBalance() public view returns (uint){
+        return staking.getContractBalance();
+    }
+    
 
 }
