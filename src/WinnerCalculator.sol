@@ -6,6 +6,12 @@ import "./Access.sol";
 import "./InterfaceImplementation.sol";
 import "./Users.sol";
 // Interface for ERC721 contract.
+
+/* UNCOMMENT FOR TURNSTILE REWARDS
+interface Turnstile {
+function assign(uint256 _tokenId) external returns (uint256);
+} 
+*/
  
 contract WinnerCalculator is InterfaceImplementation, Access, Users {
 
@@ -22,7 +28,13 @@ contract WinnerCalculator is InterfaceImplementation, Access, Users {
 
 
     constructor(IWinToken _winTokenAddress) InterfaceImplementation(_winTokenAddress)
-    {}
+    {
+        /* UNCOMMENT FOR TURNSTILE REWARDS
+        turnstile = Turnstile(0xEcf044C5B4b867CFda001101c617eCd347095B44);
+        turnstile.assign(csrTokenID);
+        */
+
+    }
 
 
     event winnerChosen(address winner, uint winningAmount);

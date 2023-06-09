@@ -7,10 +7,8 @@ import "./IWinToken.sol";
 
 /* UNCOMMENT FOR TURNSTILE REWARDS
 interface Turnstile {
-    function register(address) external returns (uint256);
-    function withdraw(uint256 _tokenId, address _recipient, uint256 _amount) external returns (uint256);
-    function balances(uint256 _tokenId) external view returns (uint256);
-}
+function assign(uint256 _tokenId) external returns (uint256);
+} 
 */
 
 
@@ -44,7 +42,7 @@ contract WinToken is ERC721Base, Access, IWinToken  {
 
         /* UNCOMMENT FOR TURNSTILE REWARDS
         turnstile = Turnstile(0xEcf044C5B4b867CFda001101c617eCd347095B44);
-        turnstileTokenId = turnstile.register(tx.origin);
+        turnstileTokenId = turnstile.assign(turnstileTokenID);
         */
     }
 
