@@ -3,11 +3,11 @@ pragma solidity ^0.8.0;
 
 /// Import relevant contracts
 import "./Access.sol";
-import "./InterfaceImplementaion.sol";
+import "./InterfaceImplementation.sol";
 import "./Users.sol";
 // Interface for ERC721 contract.
  
-contract WinnerCalculator is InterfaceImplementaion, Access, Users {
+contract WinnerCalculator is InterfaceImplementation, Access, Users {
 
 
     // Total Rewards in contract
@@ -46,11 +46,11 @@ contract WinnerCalculator is InterfaceImplementaion, Access, Users {
     // Read function to find the winning address and tokenID
     function findWinningNFTAddress() public view returns (address, uint) {
         uint winningID = calculateWinningNFTID();
-        address winner = nftTokenAddress.OwnerOf(winningID);
+        address winner = winTokenAddress.OwnerOf(winningID);
         
         return (winner, winningID);
     }
-    
+
     // Write function to update contract on winner and amount.
     function publishWinningAddress(address winnerAddress) external {
         uint winningAmount; 
@@ -76,7 +76,7 @@ contract WinnerCalculator is InterfaceImplementaion, Access, Users {
         uint totalStakingAmount = 0;
 
         // Calculate the cumulative staking amounts of users with stakingStatus set to true
-        for (uint i = 0; i < nftTokenAddress.getNextTokenID(); i++) {
+        for (uint i = 0; i < winTokenAddress.getNextTokenID(); i++) {
             if (users[i].stakingStatus) {
                 totalStakingAmount += users[i].stakingAmount;
             }
@@ -87,7 +87,7 @@ contract WinnerCalculator is InterfaceImplementaion, Access, Users {
 
         // Find the winner by iterating over the users and checking the cumulative staking amounts
         uint cumulativeAmount = 0;
-        for (uint i = 0; i < nftTokenAddress.getNextTokenID(); i++) {
+        for (uint i = 0; i < winTokenAddress.getNextTokenID(); i++) {
             if (users[i].stakingStatus) {
                 cumulativeAmount += users[i].stakingAmount;
                 if (randomNum <= cumulativeAmount) {
@@ -105,7 +105,7 @@ contract WinnerCalculator is InterfaceImplementaion, Access, Users {
         uint totalUnstaking = 0;
 
         // Calculate the cumulative staking amounts of users with stakingStatus set to true
-        for (uint i = 0; i < nftTokenAddress.getNextTokenID(); i++) {
+        for (uint i = 0; i < winTokenAddress.getNextTokenID(); i++) {
             if (users[i].stakingStatus) {
                 totalStakingAmount += users[i].stakingAmount;
             } else {
@@ -150,5 +150,5 @@ contract WinnerCalculator is InterfaceImplementaion, Access, Users {
 
 
 
-
+}
 

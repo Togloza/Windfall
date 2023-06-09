@@ -16,7 +16,7 @@ contract FactoryContract {
         uint128 _royaltyBps
     ) 
     {
-        tokenAddress = new WinToken(_name, _symbol, _royaltyRecipient, _royaltyBps);
+        
     }
 
 

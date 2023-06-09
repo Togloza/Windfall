@@ -13,7 +13,7 @@ interface Turnstile {
 */
 
 
-contract WinToken is ERC721Base, Access, IWinToken  {
+contract WinToken is ERC721Base, Access  {
     // CSR rewards 
     /* UNCOMMENT FOR TURNSTILE REWARDS
     Turnstile immutable turnstile;
