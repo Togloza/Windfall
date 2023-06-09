@@ -3,6 +3,13 @@ pragma solidity ^0.8.0;
 
 contract Users {
     
+    // Total Rewards in contract
+    uint public totalRewards;
+
+    // Keep track of claimable rewards for the winners
+    mapping(address => uint) public winnerRewards;
+
+
     struct User {  
         uint stakingAmount;
         bool stakingStatus;

@@ -10,9 +10,6 @@ import "./Users.sol";
 contract WinnerCalculator is InterfaceImplementation, Access, Users {
 
 
-    // Total Rewards in contract
-    uint public totalRewards;
-
     // What percentage staked rewards are given out. 
     uint public payoutPercent = 800; // 800 = 8%
 
@@ -22,8 +19,7 @@ contract WinnerCalculator is InterfaceImplementation, Access, Users {
     // Updated when winner is published
     uint public winnerTimestamp;
 
-    // Keep track of claimable rewards for the winners
-    mapping(address => uint) public winnerRewards;
+
 
     constructor(IWinToken _winTokenAddress) InterfaceImplementation(_winTokenAddress)
     {}

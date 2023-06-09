@@ -6,6 +6,7 @@ pragma solidity ^0.8.0;
 
 import "./Metadata.sol";
 import "./InterfaceImplementation.sol";
+import "./Access.sol";
  
 /* UNCOMMENT FOR TURNSTILE REWARDS
 interface Turnstile {
@@ -111,11 +112,12 @@ contract Staking is Metadata, InterfaceImplementation, Access {
 
     // Calculate how much is staked and in the process of unstaking
     function checkValidUnstakingAll() external view returns (uint[] memory, uint[] memory) {
-        uint[] memory storeID = new uint[](winTokenAddress.getNextTokenID());
-        uint[] memory storeAmounts = new uint[](winTokenAddress.getNextTokenID());
+        uint nextTokenID = winTokenAddress.getNextTokenID();
+        uint[] memory storeID = new uint[](nextTokenID);
+        uint[] memory storeAmounts = new uint[](nextTokenID);
         uint count = 0; // Counter for non-zero values
 
-        for (uint i = 0; i < winTokenAddress.getNextTokenID(); i++) {
+        for (uint i = 0; i < nextTokenID; i++) {
             if (isValidUnstake(i)) {
                 storeID[count] = i;
                 storeAmounts[count] = users[i].stakingAmount;
@@ -221,9 +223,11 @@ contract Staking is Metadata, InterfaceImplementation, Access {
     function DepositTokens() external payable {
         emit depositedTokens(msg.value, msg.sender, block.timestamp);
     }
+
+    function checkTimestamp(uint timestamp) public view returns (uint) {
+        return block.timestamp - timestamp;
+    }
   
-
-
     /*///////////////////////////////////////////////////////////////
                             Contract Functions
     //////////////////////////////////////////////////////////////*/
