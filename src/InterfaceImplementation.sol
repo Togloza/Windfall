@@ -8,6 +8,7 @@ contract InterfaceImplementation is IWinToken{
 address winTokenAddress;
 constructor(IWinToken _winTokenAddress)
 {
+    require(address(_winTokenAddress) != address(0), "address 0");
     winTokenAddress = _winTokenAddress;
 }
 

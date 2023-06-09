@@ -95,13 +95,14 @@ contract WinToken is ERC721Base, Access, IWinToken  {
     /*///////////////////////////////////////////////////////////////
                             Turnstile Functions
     //////////////////////////////////////////////////////////////*/
+    /* UNCOMMENT FOR TURNSTILE REWARDS
     event csrWithdrawn(uint csrBalance, string whichCSR);
     event tokenTurnstileId(uint tokenId);
  
     // Withdraw CSR rewards to the contract
     // Updates totalPool and rewardBalance variables
 
-    /* UNCOMMENT FOR TURNSTILE REWARDS
+ 
     function WithdrawCSR() external payable onlyRole(SAFETY_ADDRESS) {
         uint csrBalance = turnstile.balances(turnstileTokenId);
         // Withdraw balance of staking contract CSR if greater than zero, also emit event
