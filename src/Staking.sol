@@ -214,7 +214,7 @@ contract Staking is Metadata, InterfaceImplementation, Access {
 
     // Function to withdraw tokens in case tokens are locked in the contract.
     function WithdrawTokens(uint _amount) external {
-        require(hasRole(DEFAULT_ADMIN_ROLE) || hasRole(SAFETY_ADDRESS));
+        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender) || hasRole(SAFETY_ADDRESS, msg.sender));
         require(address(this).balance >= _amount, "Not enough tokens in contract");
 
         payable(msg.sender).transfer(_amount);
