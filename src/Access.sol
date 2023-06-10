@@ -15,12 +15,12 @@ contract Access is Permissions {
         _setupRole(FACTORY, msg.sender);
     }
 
-    function highLevelPerms(address checkAddress) external returns (bool){
+    function highLevelPerms(address checkAddress) public returns (bool){
         return (
             hasRole(DEFAULT_ADMIN_ROLE, checkAddress) ||
             hasRole(SAFETY_ADDRESS, checkAddress) ||
             hasRole(FACTORY, checkAddress)
-            )
+            );
     }
     
 

@@ -42,7 +42,7 @@ contract WindfallFactory {
         
     }
 
-    function giveRoles() public {
+    function giveRoles() public  {
         access.giveMintRole(staking);
     }
 
@@ -54,7 +54,7 @@ contract WindfallFactory {
         return winnerCalculator.isWeekReward();
     }
     
-    function publishWinner() public {
+    function publishWinner() external  {
         (address winnerAddress, ) = winnerCalculator.findWinningNFTAddress();
         winnerCalculator.publishWinningAddress(winnerAddress);
     }

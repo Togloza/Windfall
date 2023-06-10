@@ -39,7 +39,7 @@ contract WinnerCalculator is InterfaceImplementation, Metadata {
 
     event winnerChosen(address winner, uint winningAmount);
 
-
+    
 
     // Generate a random number using current blockchain data and a random input.
     function generateRandomNumber(uint256 input) internal view returns (uint256) {
@@ -62,12 +62,7 @@ contract WinnerCalculator is InterfaceImplementation, Metadata {
 
     // Write function to update contract on winner and amount.
     function publishWinningAddress(address winnerAddress) external {
-        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender) || 
-                hasRole(SAFETY_ADDRESS, msg.sender) || 
-                hasRole(PUBLISHER, msg.sender) ||
-                hasRole(FACTORY, msg.sender),
-                "Wrong permissions"
-                );
+        require(highLevelPerms(msg.sender)  || hasRole(PUBLISHER, msg.sender),"Wrong permissions");
         uint winningAmount; 
         if (dayCounter % 7 == 0){
             winningAmount = getWeeklyWinningAmount();
