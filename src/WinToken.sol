@@ -79,6 +79,6 @@ contract WinToken is ERC721Base, Access, IWinToken  {
         super.approve(operator, tokenID);
     }
 
- 
+
  
 }

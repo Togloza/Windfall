@@ -20,28 +20,29 @@ contract WindfallFactory {
     // CSR rewards 
     /* UNCOMMENT FOR TURNSTILE REWARDS
     Turnstile immutable turnstile;
-    uint public immutable turnstileTokenId;
+    uint public immutable turnstileTokenID;
     */
 
     WinToken public winToken;
     Staking public staking;
-    Access public access;
+    
 
     constructor()
     {
         /* UNCOMMENT FOR TURNSTILE REWARDS
         turnstile = Turnstile(0xEcf044C5B4b867CFda001101c617eCd347095B44);
-        turnstileTokenId = turnstile.register(tx.origin);
+        turnstileTokenID = turnstile.register(tx.origin);
         */
-
+        //winToken = new WinToken("TestToken", "TT", msg.sender, 300, turnstileTokenID);
         winToken = new WinToken("TestToken", "TT", msg.sender, 300);
-        
+        //staking = new Staking(winToken, turnstileTokenID);
         staking = new Staking(winToken);
+
+        staking.giveMintRole(address(staking));
+        staking.givePublisherRole(msg.sender);
 
         
     }
-
-
 
     function isReadyToDraw() public view returns (bool) {
         return staking.isReadyToDraw();
@@ -50,16 +51,16 @@ contract WindfallFactory {
     function isWeekReward() public view returns (bool) {
         return staking.isWeekReward();
     }
-    
-    function publishWinner() external  {
-        (address winnerAddress, ) = staking.findWinningNFTAddress();
-        staking.publishWinningAddress(winnerAddress);
-    }
-
-
 
     function getStakingContractBalance() public view returns (uint){
         return staking.getContractBalance();
+    }
+
+
+    function publishWinner() external  {
+        require(staking.publisherPerms(msg.sender) || staking.highLevelPerms(msg.sender));
+        (address winnerAddress, ) = staking.findWinningNFTAddress();
+        staking.publishWinningAddress(winnerAddress);
     }
 
 

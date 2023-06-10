@@ -219,10 +219,6 @@ contract Staking is WinnerCalculator {
         emit depositedTokens(msg.value, msg.sender, block.timestamp);
     }
 
-    // function checkTimestamp(uint timestamp) public view returns (uint) {
-    //     return block.timestamp - timestamp;
-    // }
-  
     /*///////////////////////////////////////////////////////////////
                             Contract Functions
     //////////////////////////////////////////////////////////////*/

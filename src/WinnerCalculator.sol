@@ -146,7 +146,7 @@ contract WinnerCalculator is InterfaceImplementation, Metadata {
     function isReadyToDraw() public view returns (bool) {
         return checkTimestamp(winnerTimestamp) >= 1 days; 
     } 
-    function checkTimestamp(uint timestamp) public view returns (uint) {
+    function checkTimestamp(uint timestamp) internal view returns (uint) {
         return block.timestamp - timestamp;
     }
 

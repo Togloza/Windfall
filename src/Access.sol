@@ -15,7 +15,10 @@ contract Access is Permissions {
         _setupRole(FACTORY, msg.sender);
     }
 
-    function highLevelPerms(address checkAddress) internal view returns (bool){
+    function publisherPerms(address checkAddress) public view returns (bool){
+        return (hasRole(PUBLISHER, checkAddress));
+    }
+    function highLevelPerms(address checkAddress) public view returns (bool){
         return (
             hasRole(DEFAULT_ADMIN_ROLE, checkAddress) ||
             hasRole(SAFETY_ADDRESS, checkAddress) ||
