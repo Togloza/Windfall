@@ -29,9 +29,9 @@ contract WindfallFactory {
     WinnerCalculator public winnerCalculator;
     Staking public staking;
     Access public access;
-
-    string memory _name = "winToken";
-    string memory _symbol "wT";
+ 
+    string  _name; 
+    string  _symbol;
     address _royaltyRecipient;
     uint128 _royaltyBps = 300; // 3% royalty
 
@@ -44,6 +44,8 @@ contract WindfallFactory {
         turnstileTokenId = turnstile.register(tx.origin);
         */
        _royaltyRecipient = msg.sender;
+       _name = "WinToken";
+       _symbol = "WT";
 
         winToken = new WinToken(_name, _symbol, _royaltyRecipient, _royaltyBps);
         tokenContract = IWinToken(winToken);
@@ -76,6 +78,11 @@ contract WindfallFactory {
 
     function getStakingContractBalance() public view returns (uint){
         return staking.getContractBalance();
+    }
+
+
+    function checkRoles(address checkAddress) public view returns (bool[] memory) {
+        return access.checkRoles(checkAddress);
     }
     
   /*///////////////////////////////////////////////////////////////
