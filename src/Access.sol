@@ -44,19 +44,9 @@ contract Access is Permissions {
         grantRole(PUBLISHER, walletAddress);
     }
 
-function checkRoles(address checkAddress) public view returns (bool[] memory) {
-    bool[5] memory tempArray;
-    tempArray[0] = hasRole(DEFAULT_ADMIN_ROLE, checkAddress);
-    tempArray[1] = hasRole(SAFETY_ADDRESS, checkAddress);
-    tempArray[2] = hasRole(FACTORY, checkAddress);
-    tempArray[3] = hasRole(MINTER, checkAddress);
-    tempArray[4] = hasRole(PUBLISHER, checkAddress);
-
-    bool[] memory array = new bool[](5);
-    for (uint i = 0; i < tempArray.length; i++) {
-        array[i] = tempArray[i];
-    }
-
-    return array;
+function checkRole(address checkAddress, bytes32 role) public view returns (bool) {
+    return hasRole(role, checkAddress);
 }
+
+
 }

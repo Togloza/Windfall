@@ -24,34 +24,25 @@ contract WindfallFactory {
     */
 
     WinToken public winToken;
-    IWinToken public tokenContract;
     Staking public staking;
     Access public access;
- 
 
-
-    
-
-    constructor(string  _name, 
-    string  _symbol,
-    address _royaltyRecipient,
-    uint128 _royaltyBps = 300 // 3% royalty
-     )
+    constructor()
     {
         /* UNCOMMENT FOR TURNSTILE REWARDS
         turnstile = Turnstile(0xEcf044C5B4b867CFda001101c617eCd347095B44);
         turnstileTokenId = turnstile.register(tx.origin);
         */
 
-        winToken = new WinToken(_name, _symbol, _royaltyRecipient, _royaltyBps);
+        winToken = new WinToken("TestToken", "TT", msg.sender, 300);
         tokenContract = IWinToken(winToken);
         
-        staking = new Staking(tokenContract);
+        staking = new Staking(winToken);
 
         
     }
 
-    function giveRoles public {
+    function giveRoles() public {
         access.giveMintRole(staking);
     }
 

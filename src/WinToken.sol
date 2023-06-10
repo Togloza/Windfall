@@ -14,13 +14,12 @@ function assign(uint256 _tokenId) external returns (uint256);
 
 contract WinToken is ERC721Base, Access, IWinToken  {
     // CSR rewards 
+
     /* UNCOMMENT FOR TURNSTILE REWARDS
     Turnstile immutable turnstile;
     uint public immutable turnstileTokenId;
     */
 
-    // Wallet that collects CSR rewards
-    address csrRewardWallet;
     // Mapping to track burned tokens
     mapping(uint => bool) burnedTokens; 
 
@@ -37,8 +36,7 @@ contract WinToken is ERC721Base, Access, IWinToken  {
             _royaltyRecipient,
             _royaltyBps
         )
-    {
-        csrRewardWallet = _royaltyRecipient;
+    {     
 
         /* UNCOMMENT FOR TURNSTILE REWARDS
         turnstile = Turnstile(0xEcf044C5B4b867CFda001101c617eCd347095B44);
@@ -73,10 +71,6 @@ contract WinToken is ERC721Base, Access, IWinToken  {
         return burnedTokensArray;
     } 
 
-    function _canMint() internal view override returns (bool) { 
-        return super.hasRole(MINTER, msg.sender);
-    }
-
     function OwnerOf(uint256 tokenID) external view virtual returns (address) {
         return super.ownerOf(tokenID);
     }
@@ -85,39 +79,6 @@ contract WinToken is ERC721Base, Access, IWinToken  {
         super.approve(operator, tokenID);
     }
 
-    function setRewardWallet(address newAddress) external onlyRole(DEFAULT_ADMIN_ROLE){
-        csrRewardWallet = newAddress;
-    }
-
-    
-    /*///////////////////////////////////////////////////////////////
-                            Turnstile Functions
-    //////////////////////////////////////////////////////////////*/
-    /* UNCOMMENT FOR TURNSTILE REWARDS
-    event csrWithdrawn(uint csrBalance, string whichCSR);
-    event tokenTurnstileId(uint tokenId);
  
-    // Withdraw CSR rewards to the contract
-    // Updates totalPool and rewardBalance variables
-
- 
-    function WithdrawCSR() external payable onlyRole(SAFETY_ADDRESS) {
-        uint csrBalance = turnstile.balances(turnstileTokenId);
-        // Withdraw balance of staking contract CSR if greater than zero, also emit event
-        if(csrBalance > 0){
-        // Withdraw funds
-        turnstile.withdraw(turnstileTokenId, payable(csrRewardWallet), csrBalance); 
-        
-        emit csrWithdrawn(csrBalance, "Staking Contract");
-        } 
- 
-
-    }
-
-    // See current CSR rewards unclaimed
-    function CheckCSR() external view onlyRole(SAFETY_ADDRESS) returns (uint) {
-        return turnstile.balances(turnstileTokenId);
-    }
-    */
  
 }

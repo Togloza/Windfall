@@ -16,5 +16,4 @@ interface IWinToken {
 
     function OwnerOf(uint256 tokenID) external view returns (address);
 
-
 }
