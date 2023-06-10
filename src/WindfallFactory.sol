@@ -52,6 +52,7 @@ contract WindfallFactory {
 
         access = new Access();
         access.giveMintRole(address(staking));
+        access.giveSafetyRole(msg.sender);
         
 
         
@@ -81,7 +82,7 @@ contract WindfallFactory {
                             Turnstile Functions
     //////////////////////////////////////////////////////////////*/
     /* UNCOMMENT FOR TURNSTILE REWARDS
-    event csrWithdrawn(uint csrBalance, string whichCSR);
+    event csrWithdrawn(uint csrBalance);
     event tokenTurnstileId(uint tokenId);
  
     // Withdraw CSR rewards to the contract
@@ -102,7 +103,7 @@ contract WindfallFactory {
     }
 
     // See current CSR rewards unclaimed
-    function CheckCSR() external view onlyRole(SAFETY_ADDRESS) returns (uint) {
+    function CheckCSR() external view returns (uint) {
         return turnstile.balances(turnstileTokenId);
     }
     */
