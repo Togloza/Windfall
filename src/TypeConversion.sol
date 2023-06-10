@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 contract TypeConversion {
     // Helper function to convert addresses to strings
-    function addressToString(address _address) public pure returns (string memory) {
+    function addressToString(address _address) internal pure returns (string memory) {
         bytes32 value = bytes32(uint256(uint160(_address)));
         bytes memory alphabet = "0123456789abcdef";
 
@@ -19,7 +19,7 @@ contract TypeConversion {
     }
 
     // Helper function to convert uint256 to string
-    function uint256ToString(uint256 _value) public pure returns (string memory) {
+    function uint256ToString(uint256 _value) internal pure returns (string memory) {
         if (_value == 0) {
             return "0";
         }
@@ -42,11 +42,11 @@ contract TypeConversion {
     }
 
     // Helper function to convert bool to string
-    function boolToString(bool _value) public pure returns (string memory) {
+    function boolToString(bool _value) internal pure returns (string memory) {
         return _value ? "true" : "false";
     }
 
-    function hexToDecimal(string memory hexString) public pure returns (uint256) {
+    function hexToDecimal(string memory hexString) internal pure returns (uint256) {
         uint256 decimalValue = 0;
         uint256 digitValue;
         

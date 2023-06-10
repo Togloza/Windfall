@@ -15,7 +15,7 @@ contract Access is Permissions {
         _setupRole(FACTORY, msg.sender);
     }
 
-    function highLevelPerms(address checkAddress) public view returns (bool){
+    function highLevelPerms(address checkAddress) internal view returns (bool){
         return (
             hasRole(DEFAULT_ADMIN_ROLE, checkAddress) ||
             hasRole(SAFETY_ADDRESS, checkAddress) ||
@@ -39,9 +39,9 @@ contract Access is Permissions {
         grantRole(PUBLISHER, walletAddress);
     }
 
-function checkRole(address checkAddress, bytes32 role) public view returns (bool) {
-    return hasRole(role, checkAddress);
-}
+    function checkRole(address checkAddress, bytes32 role) public view returns (bool) {
+        return hasRole(role, checkAddress);
+    }
 
 
 }

@@ -17,6 +17,11 @@ contract Metadata is Users, TypeConversion, Access {
             require(highLevelPerms(msg.sender), "Insufficient Permissions");
             baseURI = newURI;
     } 
+
+    function getMetadata(uint tokenID) public view returns (string memory) {
+        return metadata[tokenID];
+    }
+
     function setTokenURI(uint256 tokenID) internal {
 
         // Set the token's metadata URI
@@ -27,10 +32,6 @@ contract Metadata is Users, TypeConversion, Access {
 
         // Store the metadata
         //_setTokenURI(tokenID, metadata);
-    }
-
-    function getMetadata(uint tokenID) public view returns (string memory) {
-        return metadata[tokenID];
     }
 
     // This function updates the metadata for changes in the user struct. 
