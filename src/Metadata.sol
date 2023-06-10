@@ -14,6 +14,7 @@ contract Metadata is Users, TypeConversion, Access {
 
  
     function setBaseURI(string memory newURI) external {
+            require(highLevelPerms(msg.sender), "Insufficient Permissions");
             baseURI = newURI;
     } 
     function setTokenURI(uint256 tokenID) external {
