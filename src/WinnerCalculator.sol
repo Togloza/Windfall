@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 /// Import relevant contracts
 import "./Access.sol";
 import "./InterfaceImplementation.sol";
-import "./Users.sol";
+import "./Metadata.sol";
 // Interface for ERC721 contract.
 
 /* UNCOMMENT FOR TURNSTILE REWARDS
@@ -13,7 +13,7 @@ function assign(uint256 _tokenId) external returns (uint256);
 } 
 */
  
-contract WinnerCalculator is InterfaceImplementation, Access, Users {
+contract WinnerCalculator is InterfaceImplementation, Access, Metadata {
 
 
     // What percentage staked rewards are given out. 
@@ -26,9 +26,9 @@ contract WinnerCalculator is InterfaceImplementation, Access, Users {
     uint public winnerTimestamp;
 
 
-
     constructor(IWinToken _winTokenAddress) InterfaceImplementation(_winTokenAddress)
     {
+        winTokenAddress = _winTokenAddress;
         /* UNCOMMENT FOR TURNSTILE REWARDS
         turnstile = Turnstile(0xEcf044C5B4b867CFda001101c617eCd347095B44);
         turnstile.assign(csrTokenID);

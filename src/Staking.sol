@@ -4,9 +4,7 @@ pragma solidity ^0.8.0;
 
 // import "./IWinToken.sol";  
 
-import "./Metadata.sol";
-import "./InterfaceImplementation.sol";
-import "./Access.sol";
+import "./WinnerCalculator.sol";
  
 /* UNCOMMENT FOR TURNSTILE REWARDS
 interface Turnstile {
@@ -14,7 +12,7 @@ function assign(uint256 _tokenId) external returns (uint256);
 } 
 */
 
-contract Staking is Metadata, InterfaceImplementation, Access {
+contract Staking is WinnerCalculator {
     /*///////////////////////////////////////////////////////////////
                         Global Variables
     //////////////////////////////////////////////////////////////*/
@@ -38,8 +36,8 @@ contract Staking is Metadata, InterfaceImplementation, Access {
     /*///////////////////////////////////////////////////////////////
                         Constructor
     //////////////////////////////////////////////////////////////*/
-    constructor(IWinToken _winTokenAddress) InterfaceImplementation(_winTokenAddress) {
-        winTokenAddress = _winTokenAddress;
+    constructor(IWinToken winTokenAddress) WinnerCalculator(winTokenAddress) {
+        
         // Required for CSR rewards
         /* UNCOMMENT FOR TURNSTILE REWARDS
         turnstile = Turnstile(0xEcf044C5B4b867CFda001101c617eCd347095B44);
@@ -224,9 +222,9 @@ contract Staking is Metadata, InterfaceImplementation, Access {
         emit depositedTokens(msg.value, msg.sender, block.timestamp);
     }
 
-    function checkTimestamp(uint timestamp) public view returns (uint) {
-        return block.timestamp - timestamp;
-    }
+    // function checkTimestamp(uint timestamp) public view returns (uint) {
+    //     return block.timestamp - timestamp;
+    // }
   
     /*///////////////////////////////////////////////////////////////
                             Contract Functions

@@ -82,7 +82,6 @@ contract WinToken is ERC721Base, Access, IWinToken  {
     }
 
     function Approve(address operator, uint tokenID) external {
-        require(isApprovedOrOwner(operator, tokenID));
         super.approve(operator, tokenID);
     }
 

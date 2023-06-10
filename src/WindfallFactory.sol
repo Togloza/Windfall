@@ -2,10 +2,9 @@
 pragma solidity ^0.8.0;
 
 
+
 import "./WinToken.sol";
-import "./WinnerCalculator.sol";
 import "./Staking.sol";
-import "./Access.sol";
 
 
 interface Turnstile {
@@ -26,39 +25,34 @@ contract WindfallFactory {
 
     WinToken public winToken;
     IWinToken public tokenContract;
-    WinnerCalculator public winnerCalculator;
     Staking public staking;
     Access public access;
  
-    string  _name; 
-    string  _symbol;
-    address _royaltyRecipient;
-    uint128 _royaltyBps = 300; // 3% royalty
+
 
     
 
-    constructor() 
+    constructor(string  _name, 
+    string  _symbol,
+    address _royaltyRecipient,
+    uint128 _royaltyBps = 300 // 3% royalty
+     )
     {
         /* UNCOMMENT FOR TURNSTILE REWARDS
         turnstile = Turnstile(0xEcf044C5B4b867CFda001101c617eCd347095B44);
         turnstileTokenId = turnstile.register(tx.origin);
         */
-       _royaltyRecipient = msg.sender;
-       _name = "WinToken";
-       _symbol = "WT";
 
         winToken = new WinToken(_name, _symbol, _royaltyRecipient, _royaltyBps);
         tokenContract = IWinToken(winToken);
-        winnerCalculator = new WinnerCalculator(tokenContract);
+        
         staking = new Staking(tokenContract);
 
-        access = new Access();
-        access.giveMintRole(address(staking));
-        access.giveSafetyRole(msg.sender);
         
+    }
 
-        
-        
+    function giveRoles public {
+        access.giveMintRole(staking);
     }
 
     function isReadyToDraw() public view returns (bool) {
@@ -121,3 +115,4 @@ contract WindfallFactory {
 
 
 }
+
