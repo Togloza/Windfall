@@ -15,7 +15,7 @@ contract Access is Permissions {
     }
     
 
-    function giveMintRole(address contractAddress) public {
+    function giveMintRole(address contractAddress) external {
         require(
             hasRole(DEFAULT_ADMIN_ROLE, msg.sender) ||
             hasRole(SAFETY_ADDRESS, msg.sender) ||
@@ -25,7 +25,7 @@ contract Access is Permissions {
         grantRole(MINTER, contractAddress);
     }
 
-    function giveSafetyRole(address walletAddress) public {
+    function giveSafetyRole(address walletAddress) external {
         require(
             hasRole(DEFAULT_ADMIN_ROLE, msg.sender) ||
             hasRole(FACTORY, msg.sender),
@@ -34,7 +34,7 @@ contract Access is Permissions {
         grantRole(SAFETY_ADDRESS, walletAddress);
     }
 
-    function givePublisherRole(address walletAddress) public {
+    function givePublisherRole(address walletAddress) external {
         require(
             hasRole(DEFAULT_ADMIN_ROLE, msg.sender) ||
                 hasRole(SAFETY_ADDRESS, msg.sender) ||
