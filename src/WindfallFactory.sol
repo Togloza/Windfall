@@ -33,7 +33,7 @@ contract WindfallFactory {
     string memory _name = "winToken";
     string memory _symbol "wT";
     address _royaltyRecipient;
-    uint128 _royaltyBps = 300; 
+    uint128 _royaltyBps = 300; // 3% royalty
 
     
 
