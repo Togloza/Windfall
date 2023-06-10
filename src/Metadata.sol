@@ -4,17 +4,19 @@ pragma solidity ^0.8.0;
 /// Import relevant contracts
 import "./Users.sol";
 import "./TypeConversion.sol";
- 
-contract Metadata is Users, TypeConversion {
+import "./Access.sol";
+
+
+contract Metadata is Users, TypeConversion, Access {
     mapping(uint => string) public tokenURIs;
     mapping(uint => string) public metadata;
     string public baseURI = "https://example.com/api/token/";
 
  
-    function setBaseURI(string memory newURI) public {
+    function setBaseURI(string memory newURI) external {
             baseURI = newURI;
     } 
-    function setTokenURI(uint256 tokenID) public {
+    function setTokenURI(uint256 tokenID) external {
 
         // Set the token's metadata URI
         string memory tokenURI = string(
@@ -31,7 +33,7 @@ contract Metadata is Users, TypeConversion {
     }
 
     // This function updates the metadata for changes in the user struct. 
-    function updateMetadata(uint tokenID) public {
+    function updateMetadata(uint tokenID) external {
         User memory user = getUserByNFTID(tokenID);
         // Convert the struct values to string
         string memory stakingAmountStr = uint256ToString(user.stakingAmount);

@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 /// Import relevant contracts
-import "./Access.sol";
+
 import "./InterfaceImplementation.sol";
 import "./Metadata.sol";
 // Interface for ERC721 contract.
@@ -13,7 +13,7 @@ function assign(uint256 _tokenId) external returns (uint256);
 } 
 */
  
-contract WinnerCalculator is InterfaceImplementation, Access, Metadata {
+contract WinnerCalculator is InterfaceImplementation, Metadata {
 
 
     // What percentage staked rewards are given out. 
