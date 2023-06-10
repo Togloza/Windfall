@@ -13,11 +13,11 @@ contract Metadata is Users, TypeConversion, Access {
     string public baseURI = "https://example.com/api/token/";
 
  
-    function setBaseURI(string memory newURI) external {
+    function setBaseURI(string memory newURI) public {
             require(highLevelPerms(msg.sender), "Insufficient Permissions");
             baseURI = newURI;
     } 
-    function setTokenURI(uint256 tokenID) external {
+    function setTokenURI(uint256 tokenID) internal {
 
         // Set the token's metadata URI
         string memory tokenURI = string(
@@ -34,7 +34,7 @@ contract Metadata is Users, TypeConversion, Access {
     }
 
     // This function updates the metadata for changes in the user struct. 
-    function updateMetadata(uint tokenID) external {
+    function updateMetadata(uint tokenID) internal {
         User memory user = getUserByNFTID(tokenID);
         // Convert the struct values to string
         string memory stakingAmountStr = uint256ToString(user.stakingAmount);

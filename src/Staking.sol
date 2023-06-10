@@ -40,7 +40,7 @@ contract Staking is WinnerCalculator {
         turnstile = Turnstile(0xEcf044C5B4b867CFda001101c617eCd347095B44);
         turnstile.assign(csrTokenID);
         */
-
+    
     } 
 
     /*///////////////////////////////////////////////////////////////

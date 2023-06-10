@@ -35,28 +35,25 @@ contract WindfallFactory {
         */
 
         winToken = new WinToken("TestToken", "TT", msg.sender, 300);
-        tokenContract = IWinToken(winToken);
         
         staking = new Staking(winToken);
 
         
     }
 
-    function giveRoles() public  {
-        access.giveMintRole(staking);
-    }
+
 
     function isReadyToDraw() public view returns (bool) {
-        return winnerCalculator.isReadyToDraw();
+        return staking.isReadyToDraw();
     }
 
     function isWeekReward() public view returns (bool) {
-        return winnerCalculator.isWeekReward();
+        return staking.isWeekReward();
     }
     
     function publishWinner() external  {
-        (address winnerAddress, ) = winnerCalculator.findWinningNFTAddress();
-        winnerCalculator.publishWinningAddress(winnerAddress);
+        (address winnerAddress, ) = staking.findWinningNFTAddress();
+        staking.publishWinningAddress(winnerAddress);
     }
 
 
@@ -66,10 +63,6 @@ contract WindfallFactory {
     }
 
 
-    function checkRoles(address checkAddress) public view returns (bool[] memory) {
-        return access.checkRoles(checkAddress);
-    }
-    
   /*///////////////////////////////////////////////////////////////
                             Turnstile Functions
     //////////////////////////////////////////////////////////////*/
