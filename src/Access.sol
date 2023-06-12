@@ -27,21 +27,6 @@ contract Access is Permissions {
     }
     
 
-    function giveMintRole(address contractAddress) external {
-        require(highLevelPerms(msg.sender), "Insufficient Permissions");
-        grantRole(MINTER, contractAddress);
-    }
-
-    function giveSafetyRole(address walletAddress) external {
-        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender), "Insufficient Permissions");
-        grantRole(SAFETY_ADDRESS, walletAddress);
-    }
-
-    function givePublisherRole(address walletAddress) external {
-        require(highLevelPerms(msg.sender), "Insufficient Permissions");
-        grantRole(PUBLISHER, walletAddress);
-    }
-
     function checkRole(address checkAddress, bytes32 role) public view returns (bool) {
         return hasRole(role, checkAddress);
     }

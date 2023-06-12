@@ -54,6 +54,7 @@ contract WinnerCalculator is InterfaceImplementation, Metadata {
     function generateRandomNumber(uint256 input) internal view returns (uint256) {
     uint256 randomNumber = uint256(
         keccak256(abi.encodePacked(
+            secondsSinceLastDraw(),
             blockhash(block.number - 1), // Use the previous block's hash instead of block.timestamp
             blockhash(block.number - 2), // Use an older block's hash for additional randomness
             input

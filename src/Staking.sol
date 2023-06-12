@@ -77,7 +77,7 @@ contract Staking is WinnerCalculator {
         setTokenURI(tokenID);
         updateMetadata(tokenID);
         // Mint the token to the sender using the generated URI.
-        winTokenAddress.MintTo(msg.sender, tokenURIs[tokenID]);
+        winTokenAddress.mintTo(msg.sender, tokenURIs[tokenID]);
     } 
 
     // Function checks if the sender is permitted to send the token, and that it isn't already being unstaked.

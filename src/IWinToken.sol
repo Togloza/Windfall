@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 interface IWinToken {
     
 
-    function MintTo(address _to, string memory _tokenURI) external;
+    function mintTo(address _to, string memory _tokenURI) external;
 
     function isApproved(address operator, uint tokenID) external view returns (bool);
 

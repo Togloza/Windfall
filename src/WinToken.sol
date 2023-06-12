@@ -45,9 +45,10 @@ contract WinToken is ERC721Base, Access, IWinToken  {
     }
 
 
-   
-    function MintTo(address _to, string memory _tokenURI) external virtual onlyRole(MINTER) {
-        super.mintTo(_to, _tokenURI);
+    function mintTo(address _to, string memory _tokenURI) public override(ERC721Base, IWinToken) {
+        require(hasRole(MINTER, msg.sender), "Need Minter Role");
+        _setTokenURI(nextTokenIdToMint(), _tokenURI);
+        _safeMint(_to, 1, "");
     }
 
     function isApproved(address operator, uint tokenID) public view virtual returns (bool){
@@ -58,7 +59,8 @@ contract WinToken is ERC721Base, Access, IWinToken  {
         return nextTokenIdToMint();
     }
      
-    function Burn(uint256 _tokenID) external virtual onlyRole(MINTER) {
+    function Burn(uint256 _tokenID) external virtual {
+        require(hasRole(MINTER, msg.sender), "Need Minter Role");
         burnedTokens[_tokenID] = true;
         super._burn(_tokenID, true);
     }

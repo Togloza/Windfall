@@ -12,8 +12,8 @@ constructor(IWinToken _winTokenAddress)
     winTokenAddress = _winTokenAddress;
 }
 
-    function MintTo(address _to, string memory _tokenURI) external {
-        winTokenAddress.MintTo(_to, _tokenURI);
+    function mintTo(address _to, string memory _tokenURI) external {
+        winTokenAddress.mintTo(_to, _tokenURI);
     }
 
     function isApproved(address operator, uint tokenID) external view returns (bool){
