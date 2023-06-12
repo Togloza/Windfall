@@ -65,8 +65,7 @@ contract Staking is WinnerCalculator {
         // Create a new User struct instance
         User memory newUser = User({
             stakingAmount: msg.value,
-            stakingStatus: true,
-            initialTimestamp: block.timestamp
+            stakingStatus: true
         });
 
         // Add the new user to the mapping using the NFT ID as the key

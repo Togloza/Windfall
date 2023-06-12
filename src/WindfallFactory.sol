@@ -44,8 +44,8 @@ contract WindfallFactory {
         
     }
 
-    function isReadyToDraw() public view returns (bool) {
-        return staking.isReadyToDraw();
+    function secondsSinceLastDraw() public view returns (uint) {
+        return staking.secondsSinceLastDraw();
     }
 
     function isWeekReward() public view returns (bool) {

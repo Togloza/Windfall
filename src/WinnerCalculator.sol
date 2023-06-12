@@ -41,15 +41,26 @@ contract WinnerCalculator is InterfaceImplementation, Metadata {
 
     
 
-    // Generate a random number using current blockchain data and a random input.
+    // // Generate a random number using current blockchain data and a random input.
+    // function generateRandomNumber(uint256 input) internal view returns (uint256) {
+    //     // While miners can influece block.timestamp, block.number, the function is a read function
+    //     // And when we run the function is up to us and fairly random. 
+    //     uint256 randomNumber = uint256(
+    //         keccak256(abi.encodePacked(block.timestamp, block.number, input))
+    //     );
+    //     return randomNumber;
+    // }
+
     function generateRandomNumber(uint256 input) internal view returns (uint256) {
-        // While miners can influece block.timestamp, block.number, the function is a read function
-        // And when we run the function is up to us and fairly random. 
-        uint256 randomNumber = uint256(
-            keccak256(abi.encodePacked(block.timestamp, block.number, input))
-        );
-        return randomNumber;
-    }
+    uint256 randomNumber = uint256(
+        keccak256(abi.encodePacked(
+            blockhash(block.number - 1), // Use the previous block's hash instead of block.timestamp
+            blockhash(block.number - 2), // Use an older block's hash for additional randomness
+            input
+        ))
+    );
+    return randomNumber;
+}
 
 
     // Read function to find the winning address and tokenID
@@ -143,8 +154,8 @@ contract WinnerCalculator is InterfaceImplementation, Metadata {
         return (inputAmount * payoutPercent) / (365 * 25 * 100);// Full day's rewards plus 6 half day rewards. 
     } 
 
-    function isReadyToDraw() public view returns (bool) {
-        return checkTimestamp(winnerTimestamp) >= 1 days; 
+    function secondsSinceLastDraw() public view returns (uint) {
+        return checkTimestamp(winnerTimestamp); 
     } 
     function checkTimestamp(uint timestamp) internal view returns (uint) {
         return block.timestamp - timestamp;
@@ -154,7 +165,8 @@ contract WinnerCalculator is InterfaceImplementation, Metadata {
         return (dayCounter % 7) == 0; 
     } 
 
-    function setPayoutPercent(uint _payoutPercent) external onlyRole(DEFAULT_ADMIN_ROLE) {
+    function setPayoutPercent(uint _payoutPercent) external {
+        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender) || hasRole(SAFETY_ADDRESS, msg.sender), "Wrong Permissions");
         payoutPercent = _payoutPercent;
     }
 

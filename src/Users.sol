@@ -13,7 +13,6 @@ contract Users {
     struct User {  
         uint stakingAmount;
         bool stakingStatus;
-        uint initialTimestamp; // Currently unused, but may implement in the future.
     }
 
     mapping(uint => User) public users;

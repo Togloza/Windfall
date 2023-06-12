@@ -40,7 +40,7 @@ contract Metadata is Users, TypeConversion, Access {
         // Convert the struct values to string
         string memory stakingAmountStr = uint256ToString(user.stakingAmount);
         string memory stakingStatusStr = boolToString(user.stakingStatus);
-        string memory initialTimestampStr = uint256ToString(user.initialTimestamp);
+
 
         // Construct the metadata JSON object
         metadata[tokenID] = string(
@@ -52,9 +52,6 @@ contract Metadata is Users, TypeConversion, Access {
                 '"stakingStatus": "',
                 stakingStatusStr,
                 '",',
-                '"initialTimestamp": "',
-                initialTimestampStr,
-                '"',
                 "}"
             )
         ); 
