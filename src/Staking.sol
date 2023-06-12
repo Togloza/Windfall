@@ -21,8 +21,6 @@ contract Staking is WinnerCalculator {
     // Unstake time required by the CANTO network.
     //uint constant UNSTAKE_TIME = 21 days;
     uint constant UNSTAKE_TIME = 5 minutes;
-    // Owner's address. 
-    address private _owner;
 
     // Mapping tokenID to when users started to unstake
     mapping(uint => uint) public unstakeTimestamp;
@@ -150,12 +148,6 @@ contract Staking is WinnerCalculator {
         return (nonZeroStoreID, nonZeroStoreAmounts, storeUnstakeTimestamp);
     }
 
-    
-    /*///////////////////////////////////////////////////////////////
-                        Main Functions
-        -----------------------------------------------------
-                        Reward Functions
-    //////////////////////////////////////////////////////////////*/
 
     function checkRewards() public view returns (uint){
         return winnerRewards[msg.sender]; 
@@ -178,7 +170,10 @@ contract Staking is WinnerCalculator {
         -----------------------------------------------------
                         Validation Functions
     //////////////////////////////////////////////////////////////*/
- 
+    
+    // Function to check whether the token is vaild to unstake. 
+    // Conditions are the token isn't burned, the stakingStatus is false,
+    // And the unstakeTimestamp is greater than or equal to UNSTAKE_TIME
     function isValidUnstake(uint tokenID) internal view returns (bool) {
         bool[] memory burnedTokens = winTokenAddress.getBurnedTokens();
 
@@ -196,19 +191,13 @@ contract Staking is WinnerCalculator {
     /*///////////////////////////////////////////////////////////////
                          Helper Functions
         -----------------------------------------------------
-                         Getter Functions
+                         Utility Functions
     //////////////////////////////////////////////////////////////*/
 
-
+    // Function to return balance of this address.
     function getContractBalance() external view returns (uint){
         return address(this).balance;
     }
-
-    /*///////////////////////////////////////////////////////////////
-                         Helper Functions
-        -----------------------------------------------------
-                         Utility Functions
-    //////////////////////////////////////////////////////////////*/
 
     // Function to withdraw tokens in case tokens are locked in the contract.
     function WithdrawTokens(uint _amount) external {
@@ -218,6 +207,7 @@ contract Staking is WinnerCalculator {
         payable(msg.sender).transfer(_amount);
     }
 
+    // Function to deposit tokens into the contract as failsafe.
     function DepositTokens() external payable {
         emit depositedTokens(msg.value, msg.sender, block.timestamp);
     }
