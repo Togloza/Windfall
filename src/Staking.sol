@@ -104,31 +104,7 @@ contract Staking is WinnerCalculator {
         emit startedUnstaking(tokenID, users[tokenID].stakingAmount, block.timestamp);
     }
 
-    // Calculate how much is staked and in the process of unstaking
-    function checkValidUnstakingAll() external view returns (uint[] memory, uint[] memory) {
-        uint nextTokenID = winTokenAddress.getNextTokenID();
-        uint[] memory storeID = new uint[](nextTokenID);
-        uint[] memory storeAmounts = new uint[](nextTokenID);
-        uint count = 0; // Counter for non-zero values
 
-        for (uint i = 0; i < nextTokenID; i++) {
-            if (isValidUnstake(i)) {
-                storeID[count] = i;
-                storeAmounts[count] = users[i].stakingAmount;
-                count++;
-            }
-        }
-
-        // Create new arrays with only non-zero values
-        uint[] memory nonZeroStoreID = new uint[](count);
-        uint[] memory nonZeroStoreAmounts = new uint[](count);
-        for (uint j = 0; j < count; j++) {
-            nonZeroStoreID[j] = storeID[j];
-            nonZeroStoreAmounts[j] = storeAmounts[j];
-        }
-
-        return (nonZeroStoreID, nonZeroStoreAmounts);
-    }
 
     // If isValidUnstake and approved, burn the NFT and send stakingAmount to tokenHolder.
     function Unstake(uint tokenID) public {
@@ -144,6 +120,34 @@ contract Staking is WinnerCalculator {
         winTokenAddress.Burn(tokenID); 
          
         payable(tokenHolder).transfer(stakingAmount);
+    }
+
+        // Calculate how much is staked and in the process of unstaking
+    function checkValidUnstaking() external view returns (uint[] memory, uint[] memory, uint[] memory) {
+        uint nextTokenID = winTokenAddress.getNextTokenID();
+        uint[] memory storeID = new uint[](nextTokenID);
+        uint[] memory storeAmounts = new uint[](nextTokenID);
+        uint[] memory storeUnstakeTimestamp = new uint[](nextTokenID);
+        uint count = 0; // Counter for non-zero values
+
+        for (uint i = 0; i < nextTokenID; i++) {
+            if (isValidUnstake(i)) {
+                storeID[count] = i;
+                storeAmounts[count] = users[i].stakingAmount;
+                count++;
+            }
+            storeUnstakeTimestamp[i] = unstakeTimestamp[i];
+        }
+
+        // Create new arrays with only non-zero values
+        uint[] memory nonZeroStoreID = new uint[](count);
+        uint[] memory nonZeroStoreAmounts = new uint[](count);
+        for (uint j = 0; j < count; j++) {
+            nonZeroStoreID[j] = storeID[j];
+            nonZeroStoreAmounts[j] = storeAmounts[j];
+        }
+
+        return (nonZeroStoreID, nonZeroStoreAmounts, storeUnstakeTimestamp);
     }
 
     

@@ -27,14 +27,17 @@ contract WindfallFactory {
     Staking public staking;
     
 
-    constructor()
+    constructor(string memory _name,
+        string memory _symbol,
+        address _royaltyRecipient,
+        uint128 _royaltyBps)
     {
         /* UNCOMMENT FOR TURNSTILE REWARDS
         turnstile = Turnstile(0xEcf044C5B4b867CFda001101c617eCd347095B44);
         turnstileTokenID = turnstile.register(tx.origin);
         */
         //winToken = new WinToken("TestToken", "TT", msg.sender, 300, turnstileTokenID);
-        winToken = new WinToken("TestToken", "TT", msg.sender, 300);
+        winToken = new WinToken(_name, _symbol, _royaltyRecipient, _royaltyBps);
         //staking = new Staking(winToken, turnstileTokenID);
         staking = new Staking(winToken);
 
@@ -58,9 +61,14 @@ contract WindfallFactory {
 
 
     function publishWinner() external  {
-        require(staking.publisherPerms(msg.sender) || staking.highLevelPerms(msg.sender));
+        require(staking.hasPublisherPerms(msg.sender) || staking.highLevelPerms(msg.sender));
         (address winnerAddress, ) = staking.findWinningNFTAddress();
         staking.publishWinningAddress(winnerAddress);
+    }
+
+    function checkValidUnstaking() external view returns (uint[] memory, uint[] memory, uint[] memory) {
+        require(staking.highLevelPerms(msg.sender));
+        return staking.checkValidUnstaking();
     }
 
 
