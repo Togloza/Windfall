@@ -38,8 +38,8 @@ contract WindfallFactory {
         //staking = new Staking(winToken, turnstileTokenID);
         staking = new Staking(winToken);
 
-        staking.giveMintRole(address(staking));
-        staking.givePublisherRole(msg.sender);
+        // staking.giveMintRole(address(staking));
+        // staking.givePublisherRole(msg.sender);
 
         
     }
