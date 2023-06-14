@@ -47,25 +47,21 @@ contract WinnerCalculator is InterfaceImplementation, Metadata {
     function findWinningNFTAddress() public view returns (address, uint) {
         uint winningID = calculateWinningNFTID();
         address winner = winTokenAddress.OwnerOf(winningID);
-        
         return (winner, winningID);
     }
 
     // Write function to update contract on winner and amount.
     function publishWinningAddress(address winnerAddress) external {
         require(highLevelPerms(msg.sender)  || hasRole(PUBLISHER, msg.sender),"Wrong permissions");
+
         uint winningAmount; 
-        if (isWeekReward()){
-            winningAmount = getWeeklyWinningAmount();
-        }
-        else {
-            winningAmount = getDailyWinningAmount(); 
-        } 
-        
+        winningAmount = isWeekReward() ? getWeeklyWinningAmount() : getDailyWinningAmount(); 
+        // Update state variables
         winnerRewards[winnerAddress] += winningAmount;
         totalRewards += winningAmount;
         winnerTimestamp = block.timestamp;
         dayCounter += 1;
+
         emit winnerChosen(winnerAddress, winningAmount);
     } 
  

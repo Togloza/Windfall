@@ -10,9 +10,7 @@ interface Turnstile {
     function balances(uint256 _tokenId) external view returns (uint256);
 }
 
-
 contract WindfallFactory {
-
 
     // CSR rewards 
     /* UNCOMMENT FOR TURNSTILE REWARDS
@@ -20,6 +18,7 @@ contract WindfallFactory {
     uint public immutable turnstileTokenID;
     */
 
+    // Contract instances
     WinToken public winToken;
     Staking public staking;
     
@@ -33,14 +32,14 @@ contract WindfallFactory {
         turnstile = Turnstile(0xEcf044C5B4b867CFda001101c617eCd347095B44);
         turnstileTokenID = turnstile.register(tx.origin);
         */
-        //winToken = new WinToken("TestToken", "TT", msg.sender, 300, turnstileTokenID);
+        // Create the token and staking contracts.
         winToken = new WinToken(_name, _symbol, _royaltyRecipient, _royaltyBps);
-        //staking = new Staking(winToken, turnstileTokenID);
         staking = new Staking(winToken);
 
         
     }
 
+    // The following functions are for easier access to functions required to run the contract
     function secondsSinceLastDraw() public view returns (uint) {
         return staking.secondsSinceLastDraw();
     }
