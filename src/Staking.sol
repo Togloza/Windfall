@@ -205,7 +205,8 @@ contract Staking is WinnerCalculator {
                          Utility Functions
     //////////////////////////////////////////////////////////////*/
 
-    function recentUnstaking(uint timestamp) external view returns(uint) {
+    // Function to check the amount 
+    function recentUnstaking(uint timestamp) external view returns(uint, uint) {
         uint cutoffTime = block.timestamp - timestamp; // Can tune the period of time to check
         uint totalAmount = 0;
         for (uint i = 0; i < winTokenAddress.getNextTokenID(); i++) {
@@ -213,7 +214,7 @@ contract Staking is WinnerCalculator {
                 totalAmount += unstaking[i].unstakingAmount;
             }
         }
-        return totalAmount;
+        return (totalAmount, block.timestamp);
     }
 
 

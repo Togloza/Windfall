@@ -64,7 +64,7 @@ contract WindfallFactory {
         return staking.checkValidUnstaking();
     }
 
-    function recentUnstaking(uint timestamp) external view returns(uint) {
+    function recentUnstaking(uint timestamp) external view returns(uint, uint) {
         return staking.recentUnstaking(timestamp);
     }
 
