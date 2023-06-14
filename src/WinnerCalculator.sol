@@ -7,11 +7,7 @@ import "./InterfaceImplementation.sol";
 import "./Metadata.sol";
 // Interface for ERC721 contract.
 
-/* UNCOMMENT FOR TURNSTILE REWARDS
-interface Turnstile {
-function assign(uint256 _tokenId) external returns (uint256);
-} 
-*/
+
  
 contract WinnerCalculator is InterfaceImplementation, Metadata {
 
@@ -25,32 +21,16 @@ contract WinnerCalculator is InterfaceImplementation, Metadata {
     // Updated when winner is published
     uint public winnerTimestamp;
 
-
     constructor(IWinToken _winTokenAddress) InterfaceImplementation(_winTokenAddress)
     {
         winTokenAddress = _winTokenAddress;
-        /* UNCOMMENT FOR TURNSTILE REWARDS
-        turnstile = Turnstile(0xEcf044C5B4b867CFda001101c617eCd347095B44);
-        turnstile.assign(csrTokenID);
-        */
-
     }
-
 
     event winnerChosen(address winner, uint winningAmount);
 
-    
-
-    // // Generate a random number using current blockchain data and a random input.
-    // function generateRandomNumber(uint256 input) internal view returns (uint256) {
-    //     // While miners can influece block.timestamp, block.number, the function is a read function
-    //     // And when we run the function is up to us and fairly random. 
-    //     uint256 randomNumber = uint256(
-    //         keccak256(abi.encodePacked(block.timestamp, block.number, input))
-    //     );
-    //     return randomNumber;
-    // }
-
+    // Generate a random number using current blockchain data and a random input.
+    // While miners can influece block.timestamp, block.number, the function is a read function
+    // And when we run the function is up to us and fairly random. 
     function generateRandomNumber(uint256 input) internal view returns (uint256) {
     uint256 randomNumber = uint256(
         keccak256(abi.encodePacked(
@@ -62,7 +42,6 @@ contract WinnerCalculator is InterfaceImplementation, Metadata {
     );
     return randomNumber;
 }
-
 
     // Read function to find the winning address and tokenID
     function findWinningNFTAddress() public view returns (address, uint) {
@@ -76,7 +55,7 @@ contract WinnerCalculator is InterfaceImplementation, Metadata {
     function publishWinningAddress(address winnerAddress) external {
         require(highLevelPerms(msg.sender)  || hasRole(PUBLISHER, msg.sender),"Wrong permissions");
         uint winningAmount; 
-        if (dayCounter % 7 == 0){
+        if (isWeekReward()){
             winningAmount = getWeeklyWinningAmount();
         }
         else {
@@ -137,35 +116,45 @@ contract WinnerCalculator is InterfaceImplementation, Metadata {
         return (totalStakingAmount, totalUnstaking);
     } 
 
+    // Function to get what the daily winning amount is
     function getDailyWinningAmount() public view returns (uint) {
         (uint winningAmount, ) = getTotalStakedAmounts();
         return calculateDailyWinningAmount(winningAmount);
     }
- 
+    // Function to get what the weekly winning amount is
     function getWeeklyWinningAmount() public view returns (uint) {
         (uint winningAmount, ) = getTotalStakedAmounts();
         return calculateWeeklyWinningAmount(winningAmount);
     } 
 
+    // Function to calculate the amount to distribute daily 
+    // Half of a day's generated rewards
     function calculateDailyWinningAmount(uint inputAmount) internal view returns (uint) {
         return (inputAmount * payoutPercent) / (365 * 200 * 100); // Half day's rewards
     }
-
+     // Function to calculate the amount to distribute daily 
+    // Four times a day's generated rewards
     function calculateWeeklyWinningAmount(uint inputAmount) internal view returns (uint) {
         return (inputAmount * payoutPercent) / (365 * 25 * 100);// Full day's rewards plus 6 half day rewards. 
     } 
 
+    // How long its been since the last draw. Used in random number generator
+    // Can be used to automate publishing rewards
     function secondsSinceLastDraw() public view returns (uint) {
         return checkTimestamp(winnerTimestamp); 
     } 
+
+    // Helper function to find the difference between now and a given timestamp
     function checkTimestamp(uint timestamp) internal view returns (uint) {
         return block.timestamp - timestamp;
     }
 
+    // Boolean function to return if the weekly return should be given
     function isWeekReward() public view returns (bool) {
         return (dayCounter % 7) == 0; 
     } 
 
+    // Can be used to change the payout percentage after deployment if neccessary
     function setPayoutPercent(uint _payoutPercent) external {
         require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender) || hasRole(SAFETY_ADDRESS, msg.sender), "Wrong Permissions");
         payoutPercent = _payoutPercent;

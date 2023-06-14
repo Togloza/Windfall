@@ -1,11 +1,8 @@
 // SPDX-License-Identifier: Apache-2.0
 pragma solidity ^0.8.0;
 
-
-
 import "./WinToken.sol";
 import "./Staking.sol";
-
 
 interface Turnstile {
     function register(address) external returns (uint256);
