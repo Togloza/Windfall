@@ -15,6 +15,7 @@ contract Users {
     struct User {  
         uint stakingAmount;
         bool stakingStatus;
+        uint unstakeTimestamp;
     }
 
     // Map the tokenID to the user struct.
@@ -32,6 +33,10 @@ contract Users {
 
     function getAmountByNFTID(uint _tokenID) public view returns (uint){
         return users[_tokenID].stakingAmount;
+    }
+
+    function getUnstakeTimestampByNFTID(uint _tokenID) public view returns (uint) {
+        return users[_tokenID].unstakeTimestamp;
     }
 
 }

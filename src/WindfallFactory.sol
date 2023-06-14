@@ -68,6 +68,11 @@ contract WindfallFactory {
         return staking.recentUnstaking(timestamp);
     }
 
+    function recentUnstakingDay() external view returns(uint, uint) {
+        uint timestamp = block.timestamp - 1 days; 
+        return staking.recentUnstaking(timestamp);
+    }
+
 
   /*///////////////////////////////////////////////////////////////
                             Turnstile Functions

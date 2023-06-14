@@ -22,6 +22,8 @@ contract Staking is WinnerCalculator {
     //uint constant UNSTAKE_TIME = 21 days;
     uint constant UNSTAKE_TIME = 5 minutes;
 
+    uint public lastChecked; 
+
     struct Unstaking {
         uint unstakingAmount;
         uint unstakeTimestamp;
@@ -68,7 +70,8 @@ contract Staking is WinnerCalculator {
         // Create a new User struct instance
         User memory newUser = User({
             stakingAmount: msg.value,
-            stakingStatus: true
+            stakingStatus: true,
+            unstakeTimestamp: 0
         });
 
         // Add the new user to the mapping using the NFT ID as the key
@@ -89,30 +92,22 @@ contract Staking is WinnerCalculator {
     function startUnstake(uint tokenID) public {
         require(winTokenAddress.OwnerOf(tokenID) == msg.sender, "Not owner of token");
         // If already unstaking, revert and send message.
-        if (unstaking[tokenID].unstakeTimestamp != 0) {
+        if (users[tokenID].unstakeTimestamp != 0) {
             revert(
                 string(
                     abi.encodePacked(
                         "Unstaking already in process, seconds since unstake: ",
-                        uint256ToString(checkTimestamp(unstaking[tokenID].unstakeTimestamp))
+                        uint256ToString(checkTimestamp(users[tokenID].unstakeTimestamp))
                     )
                 )
             );
         }
         // Set unstakeTimestamp to current time, and set stakingStatus to false.
-        unstaking[tokenID].unstakeTimestamp = block.timestamp;
+        users[tokenID].unstakeTimestamp = block.timestamp;
         users[tokenID].stakingStatus = false;
         // Update the metadata to reflect the staking status and emit event.
         updateMetadata(tokenID); 
-        handleStartedUnstaking(tokenID, users[tokenID].stakingAmount, block.timestamp);
-    }
-
-    // Event listener function
-    function handleStartedUnstaking(uint tokenID, uint unstakingAmount, uint timestamp) internal {
-        // Store the event data in the mapping or perform any desired action
-        unstaking[tokenID].unstakingAmount = unstakingAmount;
-        unstaking[tokenID].unstakeTimestamp = timestamp;
-        emit startedUnstaking(tokenID, unstakingAmount, timestamp);
+        emit startedUnstaking(tokenID, users[tokenID].stakingAmount, block.timestamp);
     }
 
     // If isValidUnstake and approved, burn the NFT and send stakingAmount to tokenHolder.
@@ -145,7 +140,7 @@ contract Staking is WinnerCalculator {
                 storeAmounts[count] = users[i].stakingAmount;
                 count++;
             }
-            storeUnstakeTimestamp[i] = unstaking[i].unstakeTimestamp;
+            storeUnstakeTimestamp[i] = users[i].unstakeTimestamp;
         }
 
         // Create new arrays with only non-zero values
@@ -190,7 +185,7 @@ contract Staking is WinnerCalculator {
 
         if (
             users[tokenID].stakingStatus == false &&
-            checkTimestamp(unstaking[tokenID].unstakeTimestamp) >= UNSTAKE_TIME &&
+            checkTimestamp(users[tokenID].unstakeTimestamp) >= UNSTAKE_TIME &&
             burnedTokens[tokenID] == false
         ) {
             return true;
@@ -205,16 +200,17 @@ contract Staking is WinnerCalculator {
                          Utility Functions
     //////////////////////////////////////////////////////////////*/
 
-    // Function to check the amount 
+    // Function to check the amount needed to start unstaking.
     function recentUnstaking(uint timestamp) external view returns(uint, uint) {
         uint cutoffTime = block.timestamp - timestamp; // Can tune the period of time to check
         uint totalAmount = 0;
         for (uint i = 0; i < winTokenAddress.getNextTokenID(); i++) {
-            if (block.timestamp - unstaking[i].unstakeTimestamp < cutoffTime){
-                totalAmount += unstaking[i].unstakingAmount;
+            if (block.timestamp - users[i].unstakeTimestamp < cutoffTime){
+                totalAmount += users[i].stakingAmount;
             }
         }
-        return (totalAmount, block.timestamp);
+        lastChecked = block.timestamp;
+        return (totalAmount, lastChecked); // lastChecked can be used in the next call of the function
     }
 
 
