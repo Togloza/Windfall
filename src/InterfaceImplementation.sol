@@ -12,6 +12,8 @@ constructor(IWinToken _winTokenAddress)
     winTokenAddress = _winTokenAddress;
 }
 
+    // Implement the required functions for IWinToken interface.
+
     function mintTo(address _to, string memory _tokenURI) external {
         winTokenAddress.mintTo(_to, _tokenURI);
     }

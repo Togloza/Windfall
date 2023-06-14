@@ -8,9 +8,9 @@ interface IWinToken {
 
     function isApproved(address operator, uint tokenID) external view returns (bool);
 
-    function getNextTokenID() external view returns (uint);
+    function getNextTokenID() external view returns (uint); 
 
-    function Burn(uint256 _tokenID) external;
+    function Burn(uint256 _tokenID) external;  
 
     function getBurnedTokens() external view returns (bool[] memory);
 

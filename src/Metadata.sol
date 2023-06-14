@@ -37,12 +37,7 @@ contract Metadata is Users, TypeConversion, Access {
     // This function updates the metadata for changes in the user struct. 
     function updateMetadata(uint tokenID) internal {
         User memory user = getUserByNFTID(tokenID);
-        // Convert the struct values to string
-        string memory stakingAmountStr = 
-        string memory stakingStatusStr = ;
-        string memory 
-        string memory unstakeTimestampStr = ;
-
+       
 
         // Construct the metadata JSON object
         metadata[tokenID] = string(

@@ -5,13 +5,14 @@ import "@thirdweb-dev/contracts/extension/Permissions.sol";
 
 
 contract Access is Permissions {
+    // Roles
     bytes32 public constant MINTER = keccak256("MINTER_ROLE");
     bytes32 public constant SAFETY_ADDRESS = keccak256("SAFETY_ADDRESS_ROLE");
     bytes32 public constant PUBLISHER = keccak256("PUBLISHER_ROLE");
     bytes32 public constant FACTORY = keccak256("FACTORY_ROLE");
 
     constructor() {
-        _setupRole(DEFAULT_ADMIN_ROLE, tx.origin);
+        _setupRole(DEFAULT_ADMIN_ROLE, tx.origin); // If deployed through a factory, deployer gets admin perms
         _setupRole(FACTORY, msg.sender);
     }
 

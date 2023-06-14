@@ -217,7 +217,8 @@ contract Staking is WinnerCalculator {
         return address(this).balance;
     }
 
-    // Function to withdraw tokens in case tokens are locked in the contract.
+    // Function to withdraw tokens. Since automatic staking/unstaking to node not currently possible,
+    // Have to withdraw the tokens manually before staking.
     function WithdrawTokens(uint _amount) external {
         require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender) || hasRole(SAFETY_ADDRESS, msg.sender));
         require(address(this).balance >= _amount, "Not enough tokens in contract");

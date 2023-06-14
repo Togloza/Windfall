@@ -109,12 +109,12 @@ contract WinnerCalculator is InterfaceImplementation, Metadata {
         // can be greater than the rewards generated. 
         for (uint i = 0; i < winTokenAddress.getNextTokenID(); i++) {
             if (!users[i].stakingStatus) {
-                totalUnstaking += users[i].stakingAmount;
+                totalUnstaking += users[i].stakingAmount; // Incremented when stakingStatus is false
             } else if (block.timestamp - users[i].stakeTimestamp < 1 days) {
-                validStakingAmount += users[i].stakingAmount; 
-                totalStakingAmount += users[i].stakingAmount;
+                validStakingAmount += users[i].stakingAmount; // Incremented when stake is older than one day and stakingStatus is true
+                totalStakingAmount += users[i].stakingAmount; // Incremented when stakingStatus is true
             } else {
-                totalStakingAmount += users[i].stakingAmount;
+                totalStakingAmount += users[i].stakingAmount; // Incremented when stakingStatus is true
             }
         }
         return (validStakingAmount, totalStakingAmount, totalUnstaking);
