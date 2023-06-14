@@ -69,8 +69,7 @@ contract WindfallFactory {
     }
 
     function recentUnstakingDay() external view returns(uint, uint) {
-        uint timestamp = block.timestamp - 1 days; 
-        return staking.recentUnstaking(timestamp);
+        return staking.recentUnstaking(block.timestamp - 1 days);
     }
 
 

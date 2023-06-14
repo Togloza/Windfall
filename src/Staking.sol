@@ -22,8 +22,6 @@ contract Staking is WinnerCalculator {
     //uint constant UNSTAKE_TIME = 21 days;
     uint constant UNSTAKE_TIME = 5 minutes;
 
-    uint public lastChecked; 
-
     struct Unstaking {
         uint unstakingAmount;
         uint unstakeTimestamp;
@@ -202,15 +200,13 @@ contract Staking is WinnerCalculator {
 
     // Function to check the amount needed to start unstaking.
     function recentUnstaking(uint timestamp) external view returns(uint, uint) {
-        uint cutoffTime = block.timestamp - timestamp; // Can tune the period of time to check
         uint totalAmount = 0;
         for (uint i = 0; i < winTokenAddress.getNextTokenID(); i++) {
-            if (block.timestamp - users[i].unstakeTimestamp < cutoffTime){
+            if (users[i].unstakeTimestamp < timestamp){
                 totalAmount += users[i].stakingAmount;
             }
         }
-        lastChecked = block.timestamp;
-        return (totalAmount, lastChecked); // lastChecked can be used in the next call of the function
+        return (totalAmount, block.timestamp); // block.timestamp can be used in the next call of the function
     }
 
 
