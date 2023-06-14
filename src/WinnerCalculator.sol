@@ -85,7 +85,7 @@ contract WinnerCalculator is InterfaceImplementation, Metadata {
         // Find the winner by iterating over the users and checking the cumulative staking amounts
         uint cumulativeAmount = 0;
         for (uint i = 0; i < winTokenAddress.getNextTokenID(); i++) {
-            if (users[i].stakingStatus) {
+            if (users[i].stakingStatus && (block.timestamp - users[i].stakeTimestamp >= 1 days)) {
                 cumulativeAmount += users[i].stakingAmount;
                 if (randomNum <= cumulativeAmount) {
                     return i; // Return the NFT ID of the winner
@@ -110,7 +110,7 @@ contract WinnerCalculator is InterfaceImplementation, Metadata {
         for (uint i = 0; i < winTokenAddress.getNextTokenID(); i++) {
             if (!users[i].stakingStatus) {
                 totalUnstaking += users[i].stakingAmount; // Incremented when stakingStatus is false
-            } else if (block.timestamp - users[i].stakeTimestamp < 1 days) {
+            } else if (block.timestamp - users[i].stakeTimestamp >= 1 days) {
                 validStakingAmount += users[i].stakingAmount; // Incremented when stake is older than one day and stakingStatus is true
                 totalStakingAmount += users[i].stakingAmount; // Incremented when stakingStatus is true
             } else {
