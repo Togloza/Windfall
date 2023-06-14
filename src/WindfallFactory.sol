@@ -64,6 +64,10 @@ contract WindfallFactory {
         return staking.checkValidUnstaking();
     }
 
+    function recentUnstaking(uint timestamp) external view returns(uint) {
+        return staking.recentUnstaking(timestamp);
+    }
+
 
   /*///////////////////////////////////////////////////////////////
                             Turnstile Functions
