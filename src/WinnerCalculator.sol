@@ -96,30 +96,38 @@ contract WinnerCalculator is InterfaceImplementation, Metadata {
         revert("No winner found"); // This should never happen if there is at least one eligible user
     }
 
-    // Function to see how much is staked by users, seperated by stakingStatus
-    function getTotalStakedAmounts() public view returns (uint, uint) {
+    // Function to see how much is staked by users, seperated by stakingStatus, and 
+    function getTotalStakedAmounts() public view returns (uint, uint, uint) {
         uint totalStakingAmount = 0;
+        uint validStakingAmount = 0;
         uint totalUnstaking = 0;
 
-        // Calculate the cumulative staking amounts of users with stakingStatus set to true
+        // Calculate the cumulative staking amounts of users 
+        // Only validStakingAmount used in calculating winning amounts
+        // Reason being is that new staked amounts don't generate rewards
+        // until they are actually staked. Otherwise the winningAmounts
+        // can be greater than the rewards generated. 
         for (uint i = 0; i < winTokenAddress.getNextTokenID(); i++) {
-            if (users[i].stakingStatus) {
+            if (!users[i].stakingStatus) {
+                totalUnstaking += users[i].stakingAmount;
+            } else if (block.timestamp - users[i].stakeTimestamp < 1 days) {
+                validStakingAmount += users[i].stakingAmount; 
                 totalStakingAmount += users[i].stakingAmount;
             } else {
-                totalUnstaking += users[i].stakingAmount;
+                totalStakingAmount += users[i].stakingAmount;
             }
         }
-        return (totalStakingAmount, totalUnstaking);
+        return (validStakingAmount, totalStakingAmount, totalUnstaking);
     } 
 
     // Function to get what the daily winning amount is
     function getDailyWinningAmount() public view returns (uint) {
-        (uint winningAmount, ) = getTotalStakedAmounts();
+        (uint winningAmount, , ) = getTotalStakedAmounts();
         return calculateDailyWinningAmount(winningAmount);
     }
     // Function to get what the weekly winning amount is
     function getWeeklyWinningAmount() public view returns (uint) {
-        (uint winningAmount, ) = getTotalStakedAmounts();
+        (uint winningAmount, , ) = getTotalStakedAmounts();
         return calculateWeeklyWinningAmount(winningAmount);
     } 
 

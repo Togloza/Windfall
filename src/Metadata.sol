@@ -38,9 +38,10 @@ contract Metadata is Users, TypeConversion, Access {
     function updateMetadata(uint tokenID) internal {
         User memory user = getUserByNFTID(tokenID);
         // Convert the struct values to string
-        string memory stakingAmountStr = uint256ToString(user.stakingAmount);
-        string memory stakingStatusStr = boolToString(user.stakingStatus);
-        string memory unstakeTimestampStr = uint256ToString(user.unstakeTimestamp);
+        string memory stakingAmountStr = 
+        string memory stakingStatusStr = ;
+        string memory 
+        string memory unstakeTimestampStr = ;
 
 
         // Construct the metadata JSON object
@@ -48,13 +49,16 @@ contract Metadata is Users, TypeConversion, Access {
             abi.encodePacked(
                 "{",
                 '"stakingAmount": "',
-                stakingAmountStr,
+                uint256ToString(user.stakingAmount),
                 '",',
                 '"stakingStatus": "',
-                stakingStatusStr,
+                boolToString(user.stakingStatus),
+                '",',
+                '"stakeTimestamp": "',
+                uint256ToString(user.stakeTimestamp),
                 '",',
                 '"unstakeTimestamp": "',
-                unstakeTimestampStr,
+                uint256ToString(user.unstakeTimestamp),
                 '",',
                 "}"
             )

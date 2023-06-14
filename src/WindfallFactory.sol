@@ -10,6 +10,13 @@ interface Turnstile {
     function balances(uint256 _tokenId) external view returns (uint256);
 }
 
+// @ Dev: 
+// As it stands now, the access permissions are seperate for the staking contract and the token contract. The staking contract needs
+// the MINTER role from the token contract, so it must be called from the token contract. Permissions in the other contracts should
+// be given from the staking contract's access functions. I have been unable to find a way to instantiate the access contract in
+// the factory contract while deploying the token and staking contracts without going over the Spurious Dragon byte limit restriction.
+
+
 contract WindfallFactory {
 
     // CSR rewards 
@@ -70,6 +77,10 @@ contract WindfallFactory {
 
     function recentUnstakingDay() external view returns(uint, uint) {
         return staking.recentUnstaking(block.timestamp - 1 days);
+    }
+
+    function getTotalStakedAmounts() public view returns (uint, uint, uint) {
+        return staking.getTotalStakedAmounts();
     }
 
 

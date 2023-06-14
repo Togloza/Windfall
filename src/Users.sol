@@ -15,6 +15,7 @@ contract Users {
     struct User {  
         uint stakingAmount;
         bool stakingStatus;
+        uint stakeTimestamp;
         uint unstakeTimestamp;
     }
 
@@ -33,6 +34,10 @@ contract Users {
 
     function getAmountByNFTID(uint _tokenID) public view returns (uint){
         return users[_tokenID].stakingAmount;
+    }
+
+    function getStakeTimestampByNFTID(uint _tokenID) public view returns (uint) {
+        return users[_tokenID].stakeTimestamp;
     }
 
     function getUnstakeTimestampByNFTID(uint _tokenID) public view returns (uint) {

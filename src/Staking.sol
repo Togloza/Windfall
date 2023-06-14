@@ -69,6 +69,7 @@ contract Staking is WinnerCalculator {
         User memory newUser = User({
             stakingAmount: msg.value,
             stakingStatus: true,
+            stakeTimestamp: block.timestamp,
             unstakeTimestamp: 0
         });
 
