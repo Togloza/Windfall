@@ -20,7 +20,7 @@ contract WinToken is ERC721Base, Access, IWinToken  {
     uint public immutable turnstileTokenId;
     */
 
-    // Mapping to track burned tokens
+    // Mapping to track burned tokens.
     mapping(uint => bool) burnedTokens; 
 
 
@@ -44,27 +44,27 @@ contract WinToken is ERC721Base, Access, IWinToken  {
         */
     }
 
-
+    // Mint logic, MINTER role based on this contract's access instance.
     function mintTo(address _to, string memory _tokenURI) public override(ERC721Base, IWinToken) {
         require(hasRole(MINTER, msg.sender), "Need Minter Role");
         _setTokenURI(nextTokenIdToMint(), _tokenURI);
         _safeMint(_to, 1, "");
     }
-
+    // Check approval.
     function isApproved(address operator, uint tokenID) public view virtual returns (bool){
         return isApprovedOrOwner(operator, tokenID);
     }
-  
+    // Return the next token ID.
     function getNextTokenID() public view virtual returns (uint) {
         return nextTokenIdToMint();
     }
-     
+    // Burn token, requires MINTER role.
     function Burn(uint256 _tokenID) external virtual {
         require(hasRole(MINTER, msg.sender), "Need Minter Role");
         burnedTokens[_tokenID] = true;
         super._burn(_tokenID, true);
     }
- 
+    // Return all tokens, true return means token is burned.
     function getBurnedTokens() external view returns (bool[] memory){
         bool[] memory burnedTokensArray = new bool[](getNextTokenID());
             for (uint i = 0; i < getNextTokenID(); i++){
@@ -72,7 +72,7 @@ contract WinToken is ERC721Base, Access, IWinToken  {
             }
         return burnedTokensArray;
     } 
-
+    // Return the owner of a token.
     function OwnerOf(uint256 tokenID) external view virtual returns (address) {
         return super.ownerOf(tokenID);
     }

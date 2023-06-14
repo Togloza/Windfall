@@ -34,11 +34,12 @@ contract WindfallFactory {
         string memory _symbol,
         address _royaltyRecipient,
         uint128 _royaltyBps)
-    {
+    { // Constructor parameters needed for WinToken initialization
         /* UNCOMMENT FOR TURNSTILE REWARDS
         turnstile = Turnstile(0xEcf044C5B4b867CFda001101c617eCd347095B44);
         turnstileTokenID = turnstile.register(tx.origin);
         */
+
         // Create the token and staking contracts.
         winToken = new WinToken(_name, _symbol, _royaltyRecipient, _royaltyBps);
         staking = new Staking(winToken);
@@ -47,41 +48,47 @@ contract WindfallFactory {
     }
 
     // The following functions are for easier access to functions required to run the contract
+    
+    // See WinnerCalculator secondsSinceLastDraw
     function secondsSinceLastDraw() public view returns (uint) {
         return staking.secondsSinceLastDraw();
     }
-
+    // See WinnerCalculator isWeekReward
     function isWeekReward() public view returns (bool) {
         return staking.isWeekReward();
     }
 
-    function getStakingContractBalance() public view returns (uint){
-        return staking.getContractBalance();
+    // See WinnerCalculator getTotalStakedAmounts
+    function getTotalStakedAmounts() public view returns (uint, uint, uint) {
+        return staking.getTotalStakedAmounts();
     }
 
-
+    // See WinnerCalculator publishWinningAddress
     function publishWinner() external  {
         require(staking.hasPublisherPerms(msg.sender) || staking.highLevelPerms(msg.sender));
         (address winnerAddress, ) = staking.findWinningNFTAddress();
         staking.publishWinningAddress(winnerAddress);
     }
 
+    // See Staking getStakingContractBalance
+    function getStakingContractBalance() public view returns (uint){
+        return staking.getContractBalance();
+    }
+
+    // See Staking checkValidUnstaking
     function checkValidUnstaking() external view returns (uint[] memory, uint[] memory, uint[] memory) {
         require(staking.highLevelPerms(msg.sender));
         return staking.checkValidUnstaking();
     }
-
+    // See Staking recentUnstaking
     function recentUnstaking(uint timestamp) external view returns(uint, uint) {
         return staking.recentUnstaking(timestamp);
     }
-
+    // See Staking recentUnstaking
     function recentUnstakingDay() external view returns(uint, uint) {
         return staking.recentUnstaking(block.timestamp - 1 days);
     }
 
-    function getTotalStakedAmounts() public view returns (uint, uint, uint) {
-        return staking.getTotalStakedAmounts();
-    }
 
 
   /*///////////////////////////////////////////////////////////////

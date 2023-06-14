@@ -125,7 +125,35 @@ contract Staking is WinnerCalculator {
         payable(tokenHolder).transfer(stakingAmount);
     }
 
-        // Calculate how much is staked and in the process of unstaking
+
+    /*///////////////////////////////////////////////////////////////
+                        Main Functions
+        -----------------------------------------------------
+                        Rewards Logic
+    //////////////////////////////////////////////////////////////*/
+
+    function checkRewards() public view returns (uint){
+        return winnerRewards[msg.sender]; 
+    }
+
+    function claimRewards() public {
+        uint userRewards = checkRewards();
+        require(userRewards >= 0, "No rewards claimable");
+        // Reset user rewards, send rewards, emit event.
+        winnerRewards[msg.sender] = 0;
+        assert(totalRewards >= userRewards);
+        totalRewards -= userRewards;
+        payable(msg.sender).transfer(userRewards);
+        emit rewardsClaimed(msg.sender, userRewards);
+    }
+
+
+    /*///////////////////////////////////////////////////////////////
+                        Helper Functions
+        -----------------------------------------------------
+                        Validation Functions
+    //////////////////////////////////////////////////////////////*/
+            // Calculate how much is staked and in the process of unstaking
     function checkValidUnstaking() external view returns (uint[] memory, uint[] memory, uint[] memory) {
         uint nextTokenID = winTokenAddress.getNextTokenID();
         uint[] memory storeID = new uint[](nextTokenID);
@@ -152,29 +180,6 @@ contract Staking is WinnerCalculator {
 
         return (nonZeroStoreID, nonZeroStoreAmounts, storeUnstakeTimestamp);
     }
-
-
-    function checkRewards() public view returns (uint){
-        return winnerRewards[msg.sender]; 
-    }
-
-    function claimRewards() public {
-        uint userRewards = checkRewards();
-        require(userRewards >= 0, "No rewards claimable");
-        // Reset user rewards, send rewards, emit event.
-        winnerRewards[msg.sender] = 0;
-        assert(totalRewards >= userRewards);
-        totalRewards -= userRewards;
-        payable(msg.sender).transfer(userRewards);
-        emit rewardsClaimed(msg.sender, userRewards);
-    }
-
-
-    /*///////////////////////////////////////////////////////////////
-                        Helper Functions
-        -----------------------------------------------------
-                        Validation Functions
-    //////////////////////////////////////////////////////////////*/
     
     // Function to check whether the token is vaild to unstake. 
     // Conditions are the token isn't burned, the stakingStatus is false,

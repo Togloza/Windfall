@@ -8,8 +8,10 @@ import "./Access.sol";
 
 
 contract Metadata is Users, TypeConversion, Access {
+    // Track the tokenURI and metadata for each tokenID
     mapping(uint => string) public tokenURIs;
     mapping(uint => string) public metadata;
+
     string public baseURI = "https://example.com/api/token/";
 
  
@@ -29,16 +31,12 @@ contract Metadata is Users, TypeConversion, Access {
             abi.encodePacked(baseURI, uint256ToString(tokenID))
         );
         tokenURIs[tokenID] = tokenURI;
-
-        // Store the metadata
-        //_setTokenURI(tokenID, metadata);
     }
 
     // This function updates the metadata for changes in the user struct. 
     function updateMetadata(uint tokenID) internal {
         User memory user = getUserByNFTID(tokenID);
        
-
         // Construct the metadata JSON object
         metadata[tokenID] = string(
             abi.encodePacked(
