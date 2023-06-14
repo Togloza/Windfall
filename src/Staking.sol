@@ -19,7 +19,7 @@ contract Staking is WinnerCalculator {
     */
  
     // Unstake time required by the CANTO network.
-    //uint constant UNSTAKE_TIME = 21 days;
+    //uint constant UNSTAKE_TIME = 22 days; // 21 days for unstaking on the network, 1 day for admin to unstake
     uint constant UNSTAKE_TIME = 5 minutes;
 
     struct Unstaking {
@@ -180,7 +180,7 @@ contract Staking is WinnerCalculator {
 
         return (nonZeroStoreID, nonZeroStoreAmounts, storeUnstakeTimestamp);
     }
-    
+
     // Function to check whether the token is vaild to unstake. 
     // Conditions are the token isn't burned, the stakingStatus is false,
     // And the unstakeTimestamp is greater than or equal to UNSTAKE_TIME

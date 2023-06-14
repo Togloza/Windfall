@@ -74,7 +74,7 @@ contract WinnerCalculator is InterfaceImplementation, Metadata {
 
         // Calculate the cumulative staking amounts of users with stakingStatus set to true
         for (uint i = 0; i < winTokenAddress.getNextTokenID(); i++) {
-            if (users[i].stakingStatus) {
+            if (users[i].stakingStatus && (block.timestamp - users[i].stakeTimestamp >= 1 days)) {
                 totalStakingAmount += users[i].stakingAmount;
             }
         }
