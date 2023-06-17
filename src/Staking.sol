@@ -73,12 +73,13 @@ contract Staking is WinnerCalculator {
             unstakeTimestamp: 0
         });
 
-        // Add the new user to the mapping using the NFT ID as the key
-        users[winTokenAddress.getNextTokenID()] = newUser;
-
         // Get the next token id from the ERC721 contract
         uint256 tokenID = winTokenAddress.getNextTokenID();
-        // Dynamically generate the URI data
+
+        // Add the new user to the mapping using the NFT ID as the key
+        users[tokenID)] = newUser;
+
+        // Dynamically generate the URI/Meta data
         setTokenURI(tokenID);
         updateMetadata(tokenID);
         // Mint the token to the sender using the generated URI.
@@ -118,7 +119,7 @@ contract Staking is WinnerCalculator {
         uint stakingAmount = users[tokenID].stakingAmount;
 
         require(address(this).balance >= stakingAmount, "Not enough tokens held in contract at the moment");
-        // winTokenAddress.proxyApproval(address(this), tokenID); Approval required in front end
+
         // Burn token and transfer funds.
         winTokenAddress.Burn(tokenID); 
          
@@ -146,7 +147,6 @@ contract Staking is WinnerCalculator {
         payable(msg.sender).transfer(userRewards);
         emit rewardsClaimed(msg.sender, userRewards);
     }
-
 
     /*///////////////////////////////////////////////////////////////
                         Helper Functions
@@ -214,8 +214,6 @@ contract Staking is WinnerCalculator {
         }
         return (totalAmount, block.timestamp); // block.timestamp can be used in the next call of the function
     }
-
-
 
     // Function to return balance of this address.
     function getContractBalance() external view returns (uint){
