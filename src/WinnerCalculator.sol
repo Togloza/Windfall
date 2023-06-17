@@ -21,6 +21,10 @@ contract WinnerCalculator is InterfaceImplementation, Metadata {
     // Updated when winner is published
     uint public winnerTimestamp;
 
+
+    uint32 dayDenom = 365 * 200 * 100; // Half day's rewards
+    uint32 weekDenom = 365 * 25 * 100; // Full day's rewards plus 6 half day rewards.
+
     constructor(IWinToken _winTokenAddress) InterfaceImplementation(_winTokenAddress)
     {
         winTokenAddress = _winTokenAddress;
@@ -134,12 +138,12 @@ contract WinnerCalculator is InterfaceImplementation, Metadata {
     // Function to calculate the amount to distribute daily 
     // Half of a day's generated rewards
     function calculateDailyWinningAmount(uint inputAmount) internal view returns (uint) {
-        return (inputAmount * payoutPercent) / (365 * 200 * 100); // Half day's rewards
+        return (inputAmount * payoutPercent) / (dayDenom); 
     }
      // Function to calculate the amount to distribute daily 
     // Four times a day's generated rewards
     function calculateWeeklyWinningAmount(uint inputAmount) internal view returns (uint) {
-        return (inputAmount * payoutPercent) / (365 * 25 * 100);// Full day's rewards plus 6 half day rewards. 
+        return (inputAmount * payoutPercent) / (weekDenom); 
     } 
 
     // How long its been since the last draw. Used in random number generator
@@ -162,6 +166,13 @@ contract WinnerCalculator is InterfaceImplementation, Metadata {
     function setPayoutPercent(uint _payoutPercent) external {
         require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender) || hasRole(SAFETY_ADDRESS, msg.sender), "Wrong Permissions");
         payoutPercent = _payoutPercent;
+    }
+
+    // Function to change reward amounts if neccessary.
+    function setDenoms(uint32 _dayDenom, uint32 _weekDenom) external {
+        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender) || hasRole(SAFETY_ADDRESS, msg.sender), "Wrong Permissions");
+        dayDenom = _dayDenom;
+        weekDenom = _weekDenom;
     }
 
 
