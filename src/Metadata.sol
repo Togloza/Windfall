@@ -4,41 +4,22 @@ pragma solidity ^0.8.0;
 /// Import relevant contracts
 import "./Users.sol";
 import "./TypeConversion.sol";
-import "./Access.sol";
 
 
-contract Metadata is Users, TypeConversion, Access {
-    // Track the tokenURI and metadata for each tokenID
-    mapping(uint => string) public tokenURIs;
+contract Metadata is Users, TypeConversion {
+    // Track the metadata for each tokenId
     mapping(uint => string) public metadata;
 
-    string public baseURI = "https://example.com/api/token/";
-
- 
-    function setBaseURI(string memory newURI) public {
-            require(highLevelPerms(msg.sender), "Insufficient Permissions");
-            baseURI = newURI;
-    } 
-
-    function getMetadata(uint tokenID) public view returns (string memory) {
-        return metadata[tokenID];
-    }
-
-    function setTokenURI(uint256 tokenID) internal {
-
-        // Set the token's metadata URI
-        string memory tokenURI = string(
-            abi.encodePacked(baseURI, uint256ToString(tokenID))
-        );
-        tokenURIs[tokenID] = tokenURI;
+    function getMetadata(uint tokenId) public view returns (string memory) {
+        return metadata[tokenId];
     }
 
     // This function updates the metadata for changes in the user struct. 
-    function updateMetadata(uint tokenID) internal {
-        User memory user = getUserByNFTID(tokenID);
+    function updateMetadata(uint tokenId) internal {
+        User memory user = getUserByNFTId(tokenId);
        
         // Construct the metadata JSON object
-        metadata[tokenID] = string(
+        metadata[tokenId] = string(
             abi.encodePacked(
                 "{",
                 '"stakingAmount": "',

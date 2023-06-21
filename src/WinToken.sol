@@ -1,83 +1,60 @@
 // SPDX-License-Identifier: Apache-2.0
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.19;
 
-import "@thirdweb-dev/contracts/base/ERC721Base.sol";
+import "../node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "../node_modules/@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
+import "../node_modules/@openzeppelin/contracts/utils/Counters.sol";
 import "./Access.sol";
-import "./IWinToken.sol";
 
-/* UNCOMMENT FOR TURNSTILE REWARDS
-interface Turnstile {
-function assign(uint256 _tokenId) external returns (uint256);
-} 
-*/
+contract WinToken is ERC721, ERC721Burnable, Access {
+    using Counters for Counters.Counter;
+    Access public access;
 
+    Counters.Counter private _tokenIdCounter;
 
-contract WinToken is ERC721Base, Access, IWinToken  {
-    // CSR rewards 
+    string baseURI;
 
-    /* UNCOMMENT FOR TURNSTILE REWARDS
-    Turnstile immutable turnstile;
-    uint public immutable turnstileTokenId;
-    */
-
-    // Mapping to track burned tokens.
-    mapping(uint => bool) burnedTokens; 
-
-
-      constructor(
-        string memory _name,
-        string memory _symbol,
-        address _royaltyRecipient,
-        uint128 _royaltyBps
-    )
-        ERC721Base(
-            _name,
-            _symbol,
-            _royaltyRecipient,
-            _royaltyBps
-        )
-    {     
-
-        /* UNCOMMENT FOR TURNSTILE REWARDS
-        turnstile = Turnstile(0xEcf044C5B4b867CFda001101c617eCd347095B44);
-        turnstileTokenId = turnstile.assign(turnstileTokenID);
-        */
+    constructor(address _accessAddress) ERC721("winCanto", "winCANTO") {
+        access = Access(_accessAddress);
+        baseURI = "INSERT_BASE_URI_HERE";
     }
 
-    // Mint logic, MINTER role based on this contract's access instance.
-    function mintTo(address _to, string memory _tokenURI) public override(ERC721Base, IWinToken) {
-        require(hasRole(MINTER, msg.sender), "Need Minter Role");
-        _setTokenURI(nextTokenIdToMint(), _tokenURI);
-        _safeMint(_to, 1, "");
-    }
-    // Check approval.
-    function isApproved(address operator, uint tokenID) public view virtual returns (bool){
-        return isApprovedOrOwner(operator, tokenID);
-    }
-    // Return the next token ID.
-    function getNextTokenID() public view virtual returns (uint) {
-        return nextTokenIdToMint();
-    }
-    // Burn token, requires MINTER role.
-    function Burn(uint256 _tokenID) external virtual {
-        require(hasRole(MINTER, msg.sender), "Need Minter Role");
-        burnedTokens[_tokenID] = true;
-        super._burn(_tokenID, true);
-    }
-    // Return all tokens, true return means token is burned.
-    function getBurnedTokens() external view returns (bool[] memory){
-        bool[] memory burnedTokensArray = new bool[](getNextTokenID());
-            for (uint i = 0; i < getNextTokenID(); i++){
-                burnedTokensArray[i] = burnedTokens[i];
-            }
-        return burnedTokensArray;
-    } 
-    // Return the owner of a token.
-    function OwnerOf(uint256 tokenID) external view virtual returns (address) {
-        return super.ownerOf(tokenID);
+    function _baseURI() internal view override returns (string memory) {
+        return baseURI;
     }
 
+    function setBaseURI(string calldata newBaseURI) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        baseURI = newBaseURI;
+    }
 
+    function safeMint(address to) public onlyRole(MINTER) {
+        uint256 tokenId = _tokenIdCounter.current();
+        _tokenIdCounter.increment();
+        _safeMint(to, tokenId);
+    }
 
- 
+    function getNextTokenId() external view returns (uint256) {
+        return _tokenIdCounter.current();
+    }
+
+    function exists(uint256 tokenId) external view returns (bool) {
+        return super._exists(tokenId);
+    }
+
+    function isApproved(address spender, uint256 tokenId) public view returns (bool) {
+        return super._isApprovedOrOwner(spender, tokenId);
+    }
+
+    // The following functions are overrides required by Solidity.
+
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        override(ERC721, AccessControl)
+        returns (bool)
+    {
+        return super.supportsInterface(interfaceId);
+    }
+
+    
 }
