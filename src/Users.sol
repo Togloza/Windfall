@@ -27,7 +27,7 @@ contract Users {
         User memory user = users[_tokenID];
         return user;
     }
-
+    /*
     function getStatusByNFTID(uint _tokenID) public view returns (bool){
         return users[_tokenID].stakingStatus;
     }
@@ -43,5 +43,6 @@ contract Users {
     function getUnstakeTimestampByNFTID(uint _tokenID) public view returns (uint) {
         return users[_tokenID].unstakeTimestamp;
     }
+    */
 
 }

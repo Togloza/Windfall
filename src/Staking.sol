@@ -22,13 +22,6 @@ contract Staking is WinnerCalculator {
     //uint constant UNSTAKE_TIME = 22 days; // 21 days for unstaking on the network, 1 day for admin to unstake
     uint constant UNSTAKE_TIME = 5 minutes;
 
-    struct Unstaking {
-        uint unstakingAmount;
-        uint unstakeTimestamp;
-    }
-
-    mapping(uint => Unstaking) public unstaking;
-    mapping(uint => uint) public unstakingAmounts;
 
 
     
@@ -77,7 +70,7 @@ contract Staking is WinnerCalculator {
         uint256 tokenID = winTokenAddress.getNextTokenID();
 
         // Add the new user to the mapping using the NFT ID as the key
-        users[tokenID)] = newUser;
+        users[tokenID] = newUser;
 
         // Dynamically generate the URI/Meta data
         setTokenURI(tokenID);

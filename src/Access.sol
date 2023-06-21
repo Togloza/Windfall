@@ -12,8 +12,9 @@ contract Access is Permissions {
     bytes32 public constant FACTORY = keccak256("FACTORY_ROLE");
 
     constructor() {
-        _setupRole(DEFAULT_ADMIN_ROLE, tx.origin); // If deployed through a factory, deployer gets admin perms
+        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender); 
         _setupRole(FACTORY, msg.sender);
+        
     }
 
     function hasPublisherPerms(address checkAddress) public view returns (bool){
@@ -31,6 +32,7 @@ contract Access is Permissions {
     function checkRole(address checkAddress, bytes32 role) public view returns (bool) {
         return hasRole(role, checkAddress);
     }
+
 
 
 }

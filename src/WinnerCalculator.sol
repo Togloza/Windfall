@@ -58,8 +58,7 @@ contract WinnerCalculator is InterfaceImplementation, Metadata {
     function publishWinningAddress(address winnerAddress) external {
         require(highLevelPerms(msg.sender)  || hasRole(PUBLISHER, msg.sender),"Wrong permissions");
 
-        uint winningAmount; 
-        winningAmount = isWeekReward() ? getWeeklyWinningAmount() : getDailyWinningAmount(); 
+        uint winningAmount = isWeekReward() ? getWeeklyWinningAmount() : getDailyWinningAmount(); 
         // Update state variables
         winnerRewards[winnerAddress] += winningAmount;
         totalRewards += winningAmount;
