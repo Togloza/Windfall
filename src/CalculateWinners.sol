@@ -50,8 +50,28 @@ contract CalculateWinners is Metadata {
 }
 
 
+    // Read function to find the winning address and tokenID
+    function findWinningNFTAddress() public view returns (address, uint) {
+        uint winningID = calculateWinningNFTId();
+        address winner = wintoken.ownerOf(winningID);
+        return (winner, winningID);
+    }
 
-    // Function to calculate the Id of the winning NFTId.
+    // Write function to update contract on winner and amount.
+    function publishWinningAddress(address winnerAddress) external {
+        require(access.hasPublisherRole(msg.sender));
+
+        uint winningAmount = getWinningAmount(); 
+        // Update state variables
+        winnerRewards[winnerAddress] += winningAmount;
+        winnerTimestamp = block.timestamp;
+        dayCounter += 1;
+
+        emit winnerChosen(winnerAddress, winningAmount);
+    } 
+
+
+    // Function to calculate the ID of the winning NFTID.
     // Chances of winning are proportional to the amount staked by the users.
     // Only NFTs with stakingStatus true are counted.
     function calculateWinningNFTId() internal view returns (uint) {
@@ -73,29 +93,13 @@ contract CalculateWinners is Metadata {
             if (users[i].stakingStatus && (block.timestamp - users[i].stakeTimestamp >= 1 days)) {
                 cumulativeAmount += users[i].stakingAmount;
                 if (randomNum <= cumulativeAmount) {
-                    return i; // Return the NFT Id of the winner
+                    return i; // Return the NFT ID of the winner
                 }
             }
         }
 
         revert("No winner found"); // This should never happen if there is at least one eligible user
     }
-
-
-    // Write function to update contract on winner and amount.
-    function publishWinningAddress(address winnerAddress) external {
-        require(access.hasPublisherRole(msg.sender));
-
-        uint winningAmount = getWinningAmount(); 
-        // Update state variables
-        winnerRewards[winnerAddress] += winningAmount;
-        winnerTimestamp = block.timestamp;
-        dayCounter += 1;
-
-        emit winnerChosen(winnerAddress, winningAmount);
-    } 
-
-
     // Function to see how much is staked by users, seperated by stakingStatus, and 
     function getTotalStakedAmounts() internal view returns (uint, uint, uint) {
         uint totalStakingAmount = 0;
@@ -136,8 +140,6 @@ contract CalculateWinners is Metadata {
             return (inputAmount * payoutPercent) / (dayDenom); 
         }
     }
-
-
 
     // How long its been since the last draw. Used in random number generator
     // Can be used to automate publishing rewards
