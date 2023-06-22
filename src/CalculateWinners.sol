@@ -59,7 +59,7 @@ contract CalculateWinners is Metadata {
 
     // Write function to update contract on winner and amount.
     function publishWinningAddress(address winnerAddress) external {
-        require(access.hasPublisherRole(msg.sender));
+        require(access.hasPublisherRole(msg.sender), "Wrong Permissions");
 
         uint winningAmount = getWinningAmount(); 
         // Update state variables

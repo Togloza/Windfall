@@ -33,7 +33,7 @@ contract WindfallFactory {
     
     // See WinnerCalculator publishWinningAddress
     function publishWinner() external  {
-        require(access.hasPublisherRole(msg.sender));
+        require(access.hasPublisherRole(msg.sender), "Wrong Permissions");
         (address winnerAddress, ) = staking.findWinningNFTAddress();
         staking.publishWinningAddress(winnerAddress);
     }

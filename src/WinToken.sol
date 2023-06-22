@@ -6,7 +6,7 @@ import "../node_modules/@openzeppelin/contracts/token/ERC721/extensions/ERC721Bu
 import "../node_modules/@openzeppelin/contracts/utils/Counters.sol";
 import "./Access.sol";
 
-contract WinToken is ERC721, ERC721Burnable, Access {
+contract WinToken is ERC721, ERC721Burnable {
     using Counters for Counters.Counter;
     Access public access;
 
@@ -23,11 +23,13 @@ contract WinToken is ERC721, ERC721Burnable, Access {
         return baseURI;
     }
 
-    function setBaseURI(string calldata newBaseURI) public onlyRole(DEFAULT_ADMIN_ROLE) {
+    function setBaseURI(string calldata newBaseURI) public {
+        require(access.hasAdminRole(msg.sender));
         baseURI = newBaseURI;
     }
 
-    function safeMint(address to) public onlyRole(MINTER) {
+    function safeMint(address to) public {
+        require(access.hasMinterRole(msg.sender));
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
         _safeMint(to, tokenId);
@@ -50,7 +52,7 @@ contract WinToken is ERC721, ERC721Burnable, Access {
     function supportsInterface(bytes4 interfaceId)
         public
         view
-        override(ERC721, AccessControl)
+        override(ERC721)
         returns (bool)
     {
         return super.supportsInterface(interfaceId);
