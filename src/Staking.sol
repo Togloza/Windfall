@@ -19,7 +19,7 @@ contract Staking is CalculateWinners {
     event startedUnstaking(uint tokenId, uint unstakingAmount, uint timestamp);
     event depositedTokens(uint depositAmount, address sender, uint timestamp);
     event rewardsClaimed(address winnerAddress, uint rewardAmount);
-    event startedStaking(address to, uint tokenId);
+    event startedStaking(address to, uint tokenId, uint timestamp);
 
     event test(uint amount);
 
@@ -30,7 +30,6 @@ contract Staking is CalculateWinners {
 
 // Staking function, creates new user, set tokenURI and metadata, and mint NFT to sender.
     function stake() public payable returns(uint){
-        emit test(msg.value);
         require(msg.value > 0, "Staking 0 tokens");
         // Create a new User struct instance
         User memory newUser = User({
@@ -50,7 +49,7 @@ contract Staking is CalculateWinners {
         updateMetadata(tokenId);
         // Mint the token to the sender using the generated URI.
         wintoken.safeMint(msg.sender);
-        emit startedStaking(msg.sender, tokenId);
+        emit startedStaking(msg.sender, tokenId, newUser.stakeTimestamp);
         return(tokenId);
     } 
 

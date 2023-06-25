@@ -10,7 +10,7 @@ contract CalculateWinners is Metadata {
 
 
     // What percentage staked rewards are given out. 
-    uint private payoutPercent = 800; // 800 = 8%
+    uint32 private payoutPercent = 800; // 800 = 8%
 
     // Keep track if weekly reward due
     uint public dayCounter = 1;
@@ -76,20 +76,23 @@ contract CalculateWinners is Metadata {
     // Only NFTs with stakingStatus true are counted.
     function calculateWinningNFTId() internal view returns (uint) {
         uint totalStakingAmount = 0;
+        uint nextToken = wintoken.getNextTokenId();
 
         // Calculate the cumulative staking amounts of users with stakingStatus set to true
-        for (uint i = 0; i < wintoken.getNextTokenId(); i++) {
+        for (uint i = 0; i < nextToken; i++) {
             if (users[i].stakingStatus && (block.timestamp - users[i].stakeTimestamp >= 1 days)) {
                 totalStakingAmount += users[i].stakingAmount;
             }
         }
-
+        if (totalStakingAmount == 0){
+            revert("No valid stakers");
+        }
         // Generate a random number within the range of the cumulative staking amounts
         uint randomNum = generateRandomNumber(totalStakingAmount) % totalStakingAmount;
 
         // Find the winner by iterating over the users and checking the cumulative staking amounts
         uint cumulativeAmount = 0;
-        for (uint i = 0; i < wintoken.getNextTokenId(); i++) {
+        for (uint i = 0; i < nextToken; i++) {
             if (users[i].stakingStatus && (block.timestamp - users[i].stakeTimestamp >= 1 days)) {
                 cumulativeAmount += users[i].stakingAmount;
                 if (randomNum <= cumulativeAmount) {
@@ -122,6 +125,11 @@ contract CalculateWinners is Metadata {
             }
         }
         return (validStakingAmount, totalStakingAmount, totalUnstaking);
+    }
+
+    function getValidStakedAmounts() public view returns (uint){
+        (uint amount, , ) = getTotalStakedAmounts();
+        return amount;
     } 
 
     // Function to get what the daily winning amount is
@@ -154,7 +162,7 @@ contract CalculateWinners is Metadata {
 
 
     // Can be used to change the payout percentage after deployment if neccessary
-    function setPayoutPercent(uint _payoutPercent) external {
+    function setPayoutPercent(uint32 _payoutPercent) external {
         require(access.hasAdminRole(msg.sender) || access.hasSafetyRole(msg.sender), "Wrong Permissions");
         payoutPercent = _payoutPercent;
     }

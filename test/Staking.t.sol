@@ -17,6 +17,8 @@ contract WindfallTest is Test {
 
     address contractDeployer = 0x1804c8AB1F12E6bbf3894d4083f33e07309d1f38; 
 
+    uint totalStakingAmount = 0;
+
 
     function setUp() public {
         vm.startPrank(contractDeployer);
@@ -25,6 +27,7 @@ contract WindfallTest is Test {
         wintoken = WinToken(factory.wintoken());
         staking = Staking(factory.staking());
         access.grantRole(access.getMinterRole(), address(staking));
+        access.grantRole(access.PUBLISHER(), contractDeployer);
         vm.stopPrank();
     }
 
@@ -101,20 +104,19 @@ contract WindfallTest is Test {
         address BOB = address(0x0ad);
         address MALICIOUS = address(0x0ff);
 
+        
+
         // Alice and bob start staking
-        hoax(ALICE, 100e18);
-        uint aliceToken = staking.stake{value: 60e18}();
-        hoax(BOB, 100e18);
-        uint bobToken = staking.stake{value: 10e18}();
+        
+        uint aliceToken = createUser(ALICE, 60e18);
+        uint bobToken = createUser(BOB, 40e18);
 
         // Malicious account creates 2 tokens and fails to create third
-        vm.startPrank(MALICIOUS);
-        deal(MALICIOUS, 100e18);
-        uint malTokenOne = staking.stake{value: 20e18}();
-        uint malTokenTwo = staking.stake{value: 30e18}();
+        uint malTokenOne = createUser(MALICIOUS, 20e18);
+        uint malTokenTwo = createUser(MALICIOUS, 30e18);
         vm.expectRevert(bytes("Staking 0 tokens"));
-        uint malTokenThree = staking.stake{value: 0}();
-        vm.stopPrank();          
+        uint malTokenThree = createUser(MALICIOUS, 0);
+                  
 
         // Ownership of tokens is working properly
         assertTrue(wintoken.ownerOf(aliceToken) == ALICE);
@@ -125,39 +127,73 @@ contract WindfallTest is Test {
         // Malicious account tries to unstake other's tokens
         // Malicious account tries to unstake non-existing token
         // Malicious account tries to claim non-existant rewards
-        vm.prank(MALICIOUS);
+        vm.startPrank(MALICIOUS);
         vm.expectRevert(bytes("Not owner of token"));
         staking.startUnstake(bobToken);
-        vm.startPrank(MALICIOUS);
         vm.expectRevert(bytes("Not owner of token"));
         staking.startUnstake(aliceToken);
         vm.expectRevert(bytes("ERC721: invalid token ID"));
         staking.startUnstake(666); // Token should not exist
         vm.expectRevert(bytes("No rewards claimable"));
         staking.claimRewards();
+        vm.stopPrank();
 
-
-
-
-        vm.warp(600); // 10 minutes pass
-        vm.roll(100); // canto block time is ~6 seconds
+        // To be a vaild staker have to exceed certain staking time
+        // Which is not yet achieved at this point
+        vm.expectRevert(bytes("No valid stakers"));
+        pickWinner();
         
+        progressTime(600); // Enough time to start unstaking, not enough to win rewards
+        
+
+        // To be a vaild staker have to exceed certain staking time
+        // Which is not yet achieved at this point
+        vm.expectRevert(bytes("No valid stakers"));
+        pickWinner();
+
+        progressTime(96400); // Enough time for stakers to start winning
+
+
         // Carl and olivia start staking
         address CARL = address(0x0ae);
         address OLIVIA = address(0x0af);
 
-        hoax(CARL, 100e18);
-        uint carlToken = staking.stake{value: 100e18}();
-        hoax(OLIVIA, 100e18);
-        uint oliviaToken = staking.stake{value: 30e18}();
+        uint carlToken = createUser(CARL, 100e18);
+        uint oliviaToken = createUser(OLIVIA, 50e18);
 
         assertTrue(wintoken.ownerOf(carlToken) == CARL);
         assertTrue(wintoken.ownerOf(oliviaToken) == OLIVIA);
+
+        assertEq(staking.getWinningAmount(), staking.getValidStakedAmounts() * 800 / (365 * 2 * 10000));
+    
     }
 
-    function testFunctions() public {
-
+    function createUser(address _user, uint amount) internal returns(uint) {
+        hoax(_user, 100e18);
+        totalStakingAmount += amount;
+        return staking.stake{value: amount}();        
     }
+
+//    function checkMetadataAmount(uint tokenId) internal view returns(uint) {
+//        return staking.getMetadata(tokenId);
+//    }
+
+    function progressTime(uint timeSeconds) internal {
+        vm.warp(timeSeconds);
+        vm.roll(6*timeSeconds); // canto block time is ~6 seconds
+    }
+
+    function pickWinner() internal {
+        vm.prank(contractDeployer);
+        factory.publishWinner();
+    }
+
+
+    function testFunctions(uint tokenId) internal view {
+        console.log(staking.getMetadata(tokenId));
+    }
+
+    
 
 
 
