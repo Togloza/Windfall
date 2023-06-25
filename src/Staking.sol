@@ -21,14 +21,17 @@ contract Staking is CalculateWinners {
     event rewardsClaimed(address winnerAddress, uint rewardAmount);
     event startedStaking(address to, uint tokenId);
 
+    event test(uint amount);
+
 
 
 
 
 
 // Staking function, creates new user, set tokenURI and metadata, and mint NFT to sender.
-    function stake() public payable {
-        require(msg.value >= 0, "Staking 0 tokens");
+    function stake() public payable returns(uint){
+        emit test(msg.value);
+        require(msg.value > 0, "Staking 0 tokens");
         // Create a new User struct instance
         User memory newUser = User({
             stakingAmount: msg.value,
@@ -48,6 +51,7 @@ contract Staking is CalculateWinners {
         // Mint the token to the sender using the generated URI.
         wintoken.safeMint(msg.sender);
         emit startedStaking(msg.sender, tokenId);
+        return(tokenId);
     } 
 
     // Function checks if the sender is permitted to send the token, and that it isn't already being unstaked.
@@ -132,7 +136,7 @@ contract Staking is CalculateWinners {
 
     function claimRewards() external {
         uint userRewards = checkRewards();
-        require(userRewards >= 0, "No rewards claimable");
+        require(userRewards > 0, "No rewards claimable");
         // Reset user rewards, send rewards, emit event.
         winnerRewards[msg.sender] = 0;
         payable(msg.sender).transfer(userRewards);
