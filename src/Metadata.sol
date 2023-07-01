@@ -17,11 +17,14 @@ contract Metadata is Users, TypeConversion {
     // This function updates the metadata for changes in the user struct. 
     function updateMetadata(uint tokenId) internal {
         User memory user = getUserByNFTId(tokenId);
-       
+        string memory imageURL = user.stakingStatus ? "StakingImageURL" : "UnstakingImageURL";
         // Construct the metadata JSON object
         metadata[tokenId] = string(
             abi.encodePacked(
                 "{",
+                '"image": "',
+                imageURL,
+                '",',
                 '"stakingAmount": "',
                 uint256ToString(user.stakingAmount),
                 '",',
