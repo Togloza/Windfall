@@ -21,12 +21,6 @@ contract Staking is CalculateWinners {
     event rewardsClaimed(address winnerAddress, uint rewardAmount);
     event startedStaking(address to, uint tokenId, uint timestamp);
 
-    event test(uint amount);
-
-
-
-
-
 
 // Staking function, creates new user, set tokenURI and metadata, and mint NFT to sender.
     function stake() public payable returns(uint){

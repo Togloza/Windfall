@@ -96,7 +96,7 @@ contract WindfallTest is Test {
         
         string memory tokenMetadata = staking.getMetadata(tokenId);
     }
-*/
+    */
     function testBasicStakingLifetime() public {
 
         
@@ -167,6 +167,7 @@ contract WindfallTest is Test {
         assertEq(staking.getWinningAmount(), staking.getValidStakedAmounts() * 800 / (365 * 2 * 10000));
     
     }
+    
 
     function createUser(address _user, uint amount) internal returns(uint) {
         hoax(_user, 100e18);
