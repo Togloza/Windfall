@@ -63,7 +63,7 @@ contract Staking is CalculateWinners {
                 string(
                     abi.encodePacked(
                         "Unstaking already in process, seconds since unstake: ",
-                        uint256ToString(checkTimestamp(users[tokenId].unstakeTimestamp))
+                        Strings.toString(checkTimestamp(users[tokenId].unstakeTimestamp))
                     )
                 )
             );

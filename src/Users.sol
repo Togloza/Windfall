@@ -28,5 +28,9 @@ contract Users {
         return users[_tokenId].stakingAmount;
     }
 
+    function getStatusByNFTId(uint _tokenId) public view returns (bool) {
+        return users[_tokenId].stakingStatus;
+    }
+
 
 }
