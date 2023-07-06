@@ -2,14 +2,12 @@
 pragma solidity ^0.8.19;
 
 contract Users {
-    
-
     // Keep track of claimable rewards for the winners
     // Maybe used in metadata contract, so kept in Users contract.
     mapping(address => uint) public winnerRewards;
 
     // Holds data needed for every token, can be expanded if needed.
-    struct User {  
+    struct User {
         uint stakingAmount;
         bool stakingStatus;
         uint stakeTimestamp;
@@ -31,6 +29,4 @@ contract Users {
     function getStatusByNFTId(uint _tokenId) public view returns (bool) {
         return users[_tokenId].stakingStatus;
     }
-
-
 }

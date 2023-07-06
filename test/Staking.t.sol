@@ -9,16 +9,14 @@ import "../src/WinToken.sol";
 import "../src/Access.sol";
 
 contract WindfallTest is Test {
-
     WindfallFactory public factory;
     Access public access;
     WinToken public wintoken;
     Staking public staking;
 
-    address contractDeployer = 0x1804c8AB1F12E6bbf3894d4083f33e07309d1f38; 
+    address contractDeployer = 0x1804c8AB1F12E6bbf3894d4083f33e07309d1f38;
 
     uint totalStakingAmount = 0;
-
 
     function setUp() public {
         vm.startPrank(contractDeployer);
@@ -34,7 +32,8 @@ contract WindfallTest is Test {
     function testInit() public {
         assertTrue(access.hasRole(access.MINTER(), address(staking)));
     }
-/*
+
+    /*
     function testPermissionRestrictions() public {
         address randomUser = address(0x0aa);
 
@@ -98,16 +97,12 @@ contract WindfallTest is Test {
     }
     */
     function testBasicStakingLifetime() public {
-
-        
         address ALICE = address(0x0ac);
         address BOB = address(0x0ad);
         address MALICIOUS = address(0x0ff);
 
-        
-
         // Alice and bob start staking
-        
+
         uint aliceToken = createUser(ALICE, 60e18);
         uint bobToken = createUser(BOB, 40e18);
 
@@ -116,7 +111,6 @@ contract WindfallTest is Test {
         uint malTokenTwo = createUser(MALICIOUS, 30e18);
         vm.expectRevert(bytes("Staking 0 tokens"));
         uint malTokenThree = createUser(MALICIOUS, 0);
-                  
 
         // Ownership of tokens is working properly
         assertTrue(wintoken.ownerOf(aliceToken) == ALICE);
@@ -142,9 +136,8 @@ contract WindfallTest is Test {
         // Which is not yet achieved at this point
         vm.expectRevert(bytes("No valid stakers"));
         pickWinner();
-        
+
         progressTime(600); // Enough time to start unstaking, not enough to win rewards
-        
 
         // To be a vaild staker have to exceed certain staking time
         // Which is not yet achieved at this point
@@ -152,7 +145,6 @@ contract WindfallTest is Test {
         pickWinner();
 
         progressTime(96400); // Enough time for stakers to start winning
-
 
         // Carl and olivia start staking
         address CARL = address(0x0ae);
@@ -164,24 +156,25 @@ contract WindfallTest is Test {
         assertTrue(wintoken.ownerOf(carlToken) == CARL);
         assertTrue(wintoken.ownerOf(oliviaToken) == OLIVIA);
 
-        assertEq(staking.getWinningAmount(), staking.getValidStakedAmounts() * 800 / (365 * 2 * 10000));
-    
+        assertEq(
+            staking.getWinningAmount(),
+            (staking.getValidStakedAmounts() * 800) / (365 * 2 * 10000)
+        );
     }
-    
 
-    function createUser(address _user, uint amount) internal returns(uint) {
+    function createUser(address _user, uint amount) internal returns (uint) {
         hoax(_user, 100e18);
         totalStakingAmount += amount;
-        return staking.stake{value: amount}();        
+        return staking.stake{value: amount}();
     }
 
-//    function checkMetadataAmount(uint tokenId) internal view returns(uint) {
-//        return staking.getMetadata(tokenId);
-//    }
+    //    function checkMetadataAmount(uint tokenId) internal view returns(uint) {
+    //        return staking.getMetadata(tokenId);
+    //    }
 
     function progressTime(uint timeSeconds) internal {
         vm.warp(timeSeconds);
-        vm.roll(6*timeSeconds); // canto block time is ~6 seconds
+        vm.roll(6 * timeSeconds); // canto block time is ~6 seconds
     }
 
     function pickWinner() internal {
@@ -189,13 +182,7 @@ contract WindfallTest is Test {
         factory.publishWinner();
     }
 
-
     function testFunctions(uint tokenId) internal view {
         console.log(staking.getMetadata(tokenId));
     }
-
-    
-
-
-
 }

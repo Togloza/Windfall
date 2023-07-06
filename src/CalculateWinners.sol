@@ -8,8 +8,7 @@ contract CalculateWinners is Metadata {
     Access public access;
     WinToken public wintoken;
 
-
-    // What percentage staked rewards are given out. 
+    // What percentage staked rewards are given out.
     uint32 private payoutPercent = 800; // 800 = 8%
 
     // Keep track if weekly reward due
@@ -25,30 +24,30 @@ contract CalculateWinners is Metadata {
         access = Access(_accessAddress);
         wintoken = WinToken(_winTokenAddress);
 
-
         dayDenom = 365 * 2 * 10000; // Half day's rewards
         weekDenom = 365 * 2500; // Full day's rewards plus 6 half day rewards.
     }
 
     event winnerChosen(address winner, uint winningAmount);
 
-
-
     // Generate a random number using current blockchain data and a random input.
     // While miners can influece block.timestamp, block.number, the function is a read function
-    // And when we run the function is up to us and fairly random. 
-    function generateRandomNumber(uint256 input) internal view returns (uint256) {
-    uint256 randomNumber = uint256(
-        keccak256(abi.encodePacked(
-            secondsSinceLastDraw(),
-            blockhash(block.number - 1), // Use the previous block's hash instead of block.timestamp
-            blockhash(block.number - 2), // Use an older block's hash for additional randomness
-            input
-        ))
-    );
-    return randomNumber;
-}
-
+    // And when we run the function is up to us and fairly random.
+    function generateRandomNumber(
+        uint256 input
+    ) internal view returns (uint256) {
+        uint256 randomNumber = uint256(
+            keccak256(
+                abi.encodePacked(
+                    secondsSinceLastDraw(),
+                    blockhash(block.number - 1), // Use the previous block's hash instead of block.timestamp
+                    blockhash(block.number - 2), // Use an older block's hash for additional randomness
+                    input
+                )
+            )
+        );
+        return randomNumber;
+    }
 
     // Read function to find the winning address and tokenID
     function findWinningNFTAddress() public view returns (address, uint) {
@@ -61,15 +60,14 @@ contract CalculateWinners is Metadata {
     function publishWinningAddress(address winnerAddress) external {
         require(access.hasPublisherRole(msg.sender), "Wrong Permissions");
 
-        uint winningAmount = getWinningAmount(); 
+        uint winningAmount = getWinningAmount();
         // Update state variables
         winnerRewards[winnerAddress] += winningAmount;
         winnerTimestamp = block.timestamp;
         dayCounter += 1;
 
         emit winnerChosen(winnerAddress, winningAmount);
-    } 
-
+    }
 
     // Function to calculate the ID of the winning NFTID.
     // Chances of winning are proportional to the amount staked by the users.
@@ -80,20 +78,27 @@ contract CalculateWinners is Metadata {
 
         // Calculate the cumulative staking amounts of users with stakingStatus set to true
         for (uint i = 0; i < nextToken; i++) {
-            if (users[i].stakingStatus && (block.timestamp - users[i].stakeTimestamp >= 1 days)) {
+            if (
+                users[i].stakingStatus &&
+                (block.timestamp - users[i].stakeTimestamp >= 1 days)
+            ) {
                 totalStakingAmount += users[i].stakingAmount;
             }
         }
-        if (totalStakingAmount == 0){
+        if (totalStakingAmount == 0) {
             revert("No valid stakers");
         }
         // Generate a random number within the range of the cumulative staking amounts
-        uint randomNum = generateRandomNumber(totalStakingAmount) % totalStakingAmount;
+        uint randomNum = generateRandomNumber(totalStakingAmount) %
+            totalStakingAmount;
 
         // Find the winner by iterating over the users and checking the cumulative staking amounts
         uint cumulativeAmount = 0;
         for (uint i = 0; i < nextToken; i++) {
-            if (users[i].stakingStatus && (block.timestamp - users[i].stakeTimestamp >= 1 days)) {
+            if (
+                users[i].stakingStatus &&
+                (block.timestamp - users[i].stakeTimestamp >= 1 days)
+            ) {
                 cumulativeAmount += users[i].stakingAmount;
                 if (randomNum <= cumulativeAmount) {
                     return i; // Return the NFT ID of the winner
@@ -103,17 +108,18 @@ contract CalculateWinners is Metadata {
 
         revert("No winner found"); // This should never happen if there is at least one eligible user
     }
-    // Function to see how much is staked by users, seperated by stakingStatus, and 
+
+    // Function to see how much is staked by users, seperated by stakingStatus, and
     function getTotalStakedAmounts() internal view returns (uint, uint, uint) {
         uint totalStakingAmount = 0;
         uint validStakingAmount = 0;
         uint totalUnstaking = 0;
 
-        // Calculate the cumulative staking amounts of users 
+        // Calculate the cumulative staking amounts of users
         // Only validStakingAmount used in calculating winning amounts
         // Reason being is that new staked amounts don't generate rewards
         // until they are actually staked. Otherwise the winningAmounts
-        // can be greater than the rewards generated. 
+        // can be greater than the rewards generated.
         for (uint i = 0; i < wintoken.getNextTokenId(); i++) {
             if (!users[i].stakingStatus) {
                 totalUnstaking += users[i].stakingAmount; // Incremented when stakingStatus is false
@@ -127,10 +133,10 @@ contract CalculateWinners is Metadata {
         return (validStakingAmount, totalStakingAmount, totalUnstaking);
     }
 
-    function getValidStakedAmounts() public view returns (uint){
+    function getValidStakedAmounts() public view returns (uint) {
         (uint amount, , ) = getTotalStakedAmounts();
         return amount;
-    } 
+    }
 
     // Function to get what the daily winning amount is
     function getWinningAmount() public view returns (uint) {
@@ -138,40 +144,45 @@ contract CalculateWinners is Metadata {
         return calculateWinningAmount(winningAmount);
     }
 
-    // Function to calculate the amount to distribute daily 
+    // Function to calculate the amount to distribute daily
     // Half of a day's generated rewards
-    function calculateWinningAmount(uint inputAmount) internal view returns (uint) {
+    function calculateWinningAmount(
+        uint inputAmount
+    ) internal view returns (uint) {
         if (dayCounter % 7 == 0) {
-            return (inputAmount * payoutPercent) / (weekDenom); 
-        }
-        else {
-            return (inputAmount * payoutPercent) / (dayDenom); 
+            return (inputAmount * payoutPercent) / (weekDenom);
+        } else {
+            return (inputAmount * payoutPercent) / (dayDenom);
         }
     }
 
     // How long its been since the last draw. Used in random number generator
     // Can be used to automate publishing rewards
     function secondsSinceLastDraw() internal view returns (uint) {
-        return checkTimestamp(winnerTimestamp); 
-    } 
+        return checkTimestamp(winnerTimestamp);
+    }
 
     // Helper function to find the difference between now and a given timestamp
     function checkTimestamp(uint timestamp) internal view returns (uint) {
         return block.timestamp - timestamp;
     }
 
-
     // Can be used to change the payout percentage after deployment if neccessary
     function setPayoutPercent(uint32 _payoutPercent) external {
-        require(access.hasAdminRole(msg.sender) || access.hasSafetyRole(msg.sender), "Wrong Permissions");
+        require(
+            access.hasAdminRole(msg.sender) || access.hasSafetyRole(msg.sender),
+            "Wrong Permissions"
+        );
         payoutPercent = _payoutPercent;
     }
 
     // Function to change reward amounts if neccessary.
     function setDenoms(uint32 _dayDenom, uint32 _weekDenom) external {
-        require(access.hasAdminRole(msg.sender) || access.hasSafetyRole(msg.sender), "Wrong Permissions");
+        require(
+            access.hasAdminRole(msg.sender) || access.hasSafetyRole(msg.sender),
+            "Wrong Permissions"
+        );
         dayDenom = _dayDenom;
         weekDenom = _weekDenom;
     }
-
 }

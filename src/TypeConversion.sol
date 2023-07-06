@@ -3,7 +3,9 @@ pragma solidity ^0.8.19;
 
 contract TypeConversion {
     // Helper function to convert addresses to strings
-    function addressToString(address _address) internal pure returns (string memory) {
+    function addressToString(
+        address _address
+    ) internal pure returns (string memory) {
         bytes32 value = bytes32(uint256(uint160(_address)));
         bytes memory alphabet = "0123456789abcdef";
 
@@ -19,7 +21,9 @@ contract TypeConversion {
     }
 
     // Helper function to convert uint256 to string
-    function uint256ToString(uint256 _value) internal pure returns (string memory) {
+    function uint256ToString(
+        uint256 _value
+    ) internal pure returns (string memory) {
         if (_value == 0) {
             return "0";
         }
@@ -46,13 +50,15 @@ contract TypeConversion {
         return _value ? "true" : "false";
     }
 
-    function hexToDecimal(string memory hexString) internal pure returns (uint256) {
+    function hexToDecimal(
+        string memory hexString
+    ) internal pure returns (uint256) {
         uint256 decimalValue = 0;
         uint256 digitValue;
-        
+
         for (uint256 i = 0; i < bytes(hexString).length; i++) {
             uint8 charCode = uint8(bytes(hexString)[i]);
-            
+
             if (charCode >= 48 && charCode <= 57) {
                 digitValue = charCode - 48;
             } else if (charCode >= 65 && charCode <= 70) {
@@ -62,10 +68,10 @@ contract TypeConversion {
             } else {
                 revert("Invalid hex string");
             }
-            
+
             decimalValue = decimalValue * 16 + digitValue;
         }
-        
+
         return decimalValue;
     }
 }

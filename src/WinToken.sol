@@ -43,20 +43,18 @@ contract WinToken is ERC721, ERC721Burnable {
         return super._exists(tokenId);
     }
 
-    function isApproved(address spender, uint256 tokenId) public view returns (bool) {
+    function isApproved(
+        address spender,
+        uint256 tokenId
+    ) public view returns (bool) {
         return super._isApprovedOrOwner(spender, tokenId);
     }
 
     // The following functions are overrides required by Solidity.
 
-    function supportsInterface(bytes4 interfaceId)
-        public
-        view
-        override(ERC721)
-        returns (bool)
-    {
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public view override(ERC721) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
-
-    
 }
