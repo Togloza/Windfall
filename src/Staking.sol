@@ -143,6 +143,12 @@ contract Staking is CalculateWinners {
         emit rewardsClaimed(msg.sender, userRewards);
     }
 
+
+    function retrievePastData() external view returns (address[7] memory, uint[7] memory){
+        // Assume that max of winningAmounts is weekly reward.
+        return (winningAddresses, winningAmounts);
+    }
+
     // Function to withdraw tokens. Since automatic staking/unstaking to node not currently possible,
     // Have to withdraw the tokens manually before staking.
     function WithdrawTokens(uint _amount) external {

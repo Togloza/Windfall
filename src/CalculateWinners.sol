@@ -20,6 +20,10 @@ contract CalculateWinners is Metadata {
     uint32 private dayDenom;
     uint32 private weekDenom;
 
+    uint256[7] internal winningAmounts;
+    address[7] internal winningAddresses;
+
+
     constructor(address _accessAddress, address _winTokenAddress) {
         access = Access(_accessAddress);
         wintoken = WinToken(_winTokenAddress);
@@ -62,9 +66,7 @@ contract CalculateWinners is Metadata {
 
         uint winningAmount = getWinningAmount();
         // Update state variables
-        winnerRewards[winnerAddress] += winningAmount;
-        winnerTimestamp = block.timestamp;
-        dayCounter += 1;
+        recordWinningData(winnerAddress, winningAmount);
 
         emit winnerChosen(winnerAddress, winningAmount);
     }
@@ -155,6 +157,24 @@ contract CalculateWinners is Metadata {
             return (inputAmount * payoutPercent) / (dayDenom);
         }
     }
+
+    function recordWinningData(address _address, uint _amount) internal {
+        require(_address != address(0) && _amount > 0, "Invalid Entry");
+        // Shift the array elements to the right
+        for (uint8 i = 6; i > 0; i--) {
+            winningAmounts[i] = winningAmounts[i - 1];
+            winningAddresses[i] = winningAddresses[i - 1];
+        }
+        
+        winnerRewards[_address] += _amount;
+        winnerTimestamp = block.timestamp;
+        dayCounter += 1;
+        // Add the new entry at the beginning
+        winningAmounts[0] = _amount;
+        winningAddresses[0] = _address;
+    }
+
+    
 
     // How long its been since the last draw. Used in random number generator
     // Can be used to automate publishing rewards
