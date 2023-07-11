@@ -9,10 +9,13 @@ contract Staking is CalculateWinners {
     //uint constant UNSTAKE_TIME = 24 days; // 21 days for unstaking on the network, 3 day for admin to unstake
     uint constant UNSTAKE_TIME = 5 minutes;
 
-    constructor(
-        address _accessAddress,
-        address _winTokenAddress
-    ) CalculateWinners(_accessAddress, _winTokenAddress) {}
+    Turnstile immutable turnstile;
+
+    constructor(address _accessAddress, address _winTokenAddress, uint _turnstileTokenId) CalculateWinners(_accessAddress, _winTokenAddress) {
+        turnstile = Turnstile(0xEcf044C5B4b867CFda001101c617eCd347095B44);
+        turnstile.assign(_turnstileTokenId);
+
+    }
 
     event receivedFunds(address sender, uint _amount);
     event startedUnstaking(uint tokenId, uint unstakingAmount, uint timestamp);
@@ -118,9 +121,7 @@ contract Staking is CalculateWinners {
     }
 
     // Function to check the amount needed to start unstaking.
-    function recentUnstaking(
-        uint timestamp
-    ) external view returns (uint, uint) {
+    function recentUnstaking(uint timestamp) external view returns (uint, uint) {
         uint totalAmount = 0;
         for (uint i = 0; i < wintoken.getNextTokenId(); i++) {
             if (users[i].unstakeTimestamp >= timestamp) {

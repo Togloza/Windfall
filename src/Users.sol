@@ -29,4 +29,12 @@ contract Users {
     function getStatusByNFTId(uint _tokenId) public view returns (bool) {
         return users[_tokenId].stakingStatus;
     }
+
+    function getStakeTimestampByNFTId(uint _tokenId) public view returns (uint) {
+        return users[_tokenId].stakeTimestamp;
+    }
+
+    function getUnstakeTimestampByNFTId(uint _tokenId) public view returns (uint) {
+        return users[_tokenId].unstakeTimestamp;
+    }
 }

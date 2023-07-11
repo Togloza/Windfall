@@ -6,6 +6,13 @@ import "../node_modules/@openzeppelin/contracts/token/ERC721/extensions/ERC721Bu
 import "../node_modules/@openzeppelin/contracts/utils/Counters.sol";
 import "./Access.sol";
 
+interface Turnstile {
+    function register(address) external returns (uint256);
+    function withdraw(uint256 _tokenId, address _recipient, uint256 _amount) external returns (uint256);
+    function balances(uint256 _tokenId) external view returns (uint256);
+    function assign(uint256 _tokenId) external returns (uint256);
+} 
+
 contract WinToken is ERC721, ERC721Burnable {
     using Counters for Counters.Counter;
     Access public access;
@@ -14,7 +21,12 @@ contract WinToken is ERC721, ERC721Burnable {
 
     string baseURI;
 
-    constructor(address _accessAddress) ERC721("winCanto", "winCANTO") {
+    Turnstile immutable turnstile;
+
+    constructor(address _accessAddress, uint _turnstileTokenId ) ERC721("winCanto", "winCANTO") {
+
+        turnstile = Turnstile(0xEcf044C5B4b867CFda001101c617eCd347095B44);
+        turnstile.assign(_turnstileTokenId);
         access = Access(_accessAddress);
         baseURI = "INSERT_BASE_URI_HERE";
     }

@@ -20,7 +20,7 @@ contract WindfallTest is Test {
 
     function setUp() public {
         vm.startPrank(contractDeployer);
-        factory = new WindfallFactory();
+        factory = new WindfallFactory(contractDeployer);
         access = Access(factory.access());
         wintoken = WinToken(factory.wintoken());
         staking = Staking(factory.staking());
