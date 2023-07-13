@@ -23,6 +23,8 @@ contract WinToken is ERC721, ERC721Burnable {
 
     Turnstile immutable turnstile;
 
+    mapping (uint => address) tokenOwner;
+
     constructor(address _accessAddress, uint _turnstileTokenId ) ERC721("winCanto", "winCANTO") {
 
         turnstile = Turnstile(0xEcf044C5B4b867CFda001101c617eCd347095B44);
@@ -43,13 +45,28 @@ contract WinToken is ERC721, ERC721Burnable {
     function safeMint(address to) public {
         require(access.hasMinterRole(msg.sender));
         uint256 tokenId = _tokenIdCounter.current();
+        tokenOwner[tokenId] = to; 
         _tokenIdCounter.increment();
         _safeMint(to, tokenId);
     }
 
-    function getNextTokenId() external view returns (uint256) {
+
+    function getNextTokenId() public view returns (uint256) {
         return _tokenIdCounter.current();
     }
+
+    function getTokensOfOwner(address owner) external view returns (uint[] memory) {
+    uint tokenCount = getNextTokenId();
+    uint[] memory tokenIds = new uint[](tokenCount);
+    uint counter = 0;
+    for (uint i = 0; i < tokenCount; i++) {
+        if (tokenOwner[i] == owner) {
+            tokenIds[counter] = i;
+            counter++;
+        }
+    }
+    return tokenIds;
+}
 
     function exists(uint256 tokenId) external view returns (bool) {
         return super._exists(tokenId);
@@ -61,6 +78,13 @@ contract WinToken is ERC721, ERC721Burnable {
     ) public view returns (bool) {
         return super._isApprovedOrOwner(spender, tokenId);
     }
+
+    function _beforeTokenTransfer(address from, address to, uint256 firstTokenId, uint256 batchSize) internal override {
+        require(batchSize == 1, "Batch transfer not supported"); 
+        tokenOwner[firstTokenId] = to; 
+        super._beforeTokenTransfer(from, to, firstTokenId, 1);
+    }
+
 
     // The following functions are overrides required by Solidity.
 

@@ -158,6 +158,11 @@ contract CalculateWinners is Metadata {
         }
     }
 
+    function getWiningAmounts() public view returns (uint, uint){
+        (uint inputAmount, , ) = getTotalStakedAmounts();
+        return ((inputAmount * payoutPercent) / (weekDenom),(inputAmount * payoutPercent) / (dayDenom));
+    }
+
     function recordWinningData(address _address, uint _amount) internal {
         require(_address != address(0) && _amount > 0, "Invalid Entry");
         // Shift the array elements to the right
