@@ -78,8 +78,8 @@ contract Metadata is Users {
                 "{",
                 '"image": "',
                 getStatusByNFTId(tokenId)
-                    ? "StakingImageURL"
-                    : "UnstakingImageURL",
+                    ? "https://storage.googleapis.com/windfall-wintoken/windfall-images/Staking350.png"
+                    : "https://storage.googleapis.com/windfall-wintoken/windfall-images/Staking350.png",
                 '",',
                 '"attributes": [',
                 attributes,

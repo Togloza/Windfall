@@ -14,38 +14,38 @@ interface Turnstile {
 } 
 
 contract WinToken is ERC721, ERC721Burnable {
-    using Counters for Counters.Counter;
-    Access public access;
 
+    using Counters for Counters.Counter; // Enumeration of tokens.
     Counters.Counter private _tokenIdCounter;
+
+    Access public access; // Instantiate access contract for perms to be global across contracts.
 
     string baseURI;
 
-    Turnstile immutable turnstile;
+    Turnstile immutable turnstile; // Needed for CANTO CSR.
 
-    mapping (uint => address) tokenOwner;
+    mapping (uint => address) tokenOwner; // Track token ownership for front end.
 
-    constructor(address _accessAddress, uint _turnstileTokenId ) ERC721("winCanto", "winCANTO") {
-
-        turnstile = Turnstile(0xEcf044C5B4b867CFda001101c617eCd347095B44);
-        turnstile.assign(_turnstileTokenId);
+    constructor(address _accessAddress, uint _turnstileTokenId ) ERC721("winCanto", "WIN") {
+        turnstile = Turnstile(0xEcf044C5B4b867CFda001101c617eCd347095B44); // Initialize CSR contract.
+        turnstile.assign(_turnstileTokenId); // Assign CSR rewards to the same token as factory contract.
         access = Access(_accessAddress);
-        baseURI = "INSERT_BASE_URI_HERE";
+        baseURI = "https://storage.cloud.google.com/windfall-wintoken/windfall-metadata/";
     }
 
     function _baseURI() internal view override returns (string memory) {
         return baseURI;
     }
-
+    // Allow admin to set the baseURI in case of a need for breaking metadata changes.
     function setBaseURI(string calldata newBaseURI) public {
         require(access.hasAdminRole(msg.sender));
         baseURI = newBaseURI;
     }
-
+    // Mint tokens to "to" address, _safeMint calls _mint which calls _beforeTokenTransfer which updates tokenOwner.
+    // Minter role required. 
     function safeMint(address to) public {
         require(access.hasMinterRole(msg.sender));
         uint256 tokenId = _tokenIdCounter.current();
-        tokenOwner[tokenId] = to; 
         _tokenIdCounter.increment();
         _safeMint(to, tokenId);
     }
@@ -54,7 +54,8 @@ contract WinToken is ERC721, ERC721Burnable {
     function getNextTokenId() public view returns (uint256) {
         return _tokenIdCounter.current();
     }
-
+    // Function to find which tokens an address owns. Only to be used by front end since gas intensive.
+    // Only needed for deployment on chains that don't support retrieving token ownership easily. 
     function getTokensOfOwner(address owner) external view returns (uint[] memory) {
     uint tokenCount = getNextTokenId();
     uint[] memory tokenIds = new uint[](tokenCount);
@@ -72,19 +73,17 @@ contract WinToken is ERC721, ERC721Burnable {
         return super._exists(tokenId);
     }
 
-    function isApproved(
-        address spender,
-        uint256 tokenId
-    ) public view returns (bool) {
+    function isApproved(address spender, uint256 tokenId) public view returns (bool) {
         return super._isApprovedOrOwner(spender, tokenId);
     }
 
+    // Called before transfer events on the token. Batching doesn't make much sense so restricted.
+    // Used to track token ownership. 
     function _beforeTokenTransfer(address from, address to, uint256 firstTokenId, uint256 batchSize) internal override {
         require(batchSize == 1, "Batch transfer not supported"); 
         tokenOwner[firstTokenId] = to; 
         super._beforeTokenTransfer(from, to, firstTokenId, 1);
     }
-
 
     // The following functions are overrides required by Solidity.
 

@@ -17,9 +17,12 @@ contract CalculateWinners is Metadata {
     // Updated when winner is published
     uint public winnerTimestamp;
 
+
+    // Used for daily and weekly winning amounts.
     uint32 private dayDenom;
     uint32 private weekDenom;
 
+    // Variables used for front end past winners.
     uint256[7] internal winningAmounts;
     address[7] internal winningAddresses;
 
@@ -28,18 +31,18 @@ contract CalculateWinners is Metadata {
         access = Access(_accessAddress);
         wintoken = WinToken(_winTokenAddress);
 
+        // A day's rewards should be validStakingAmount * (PayoutPercent / 10000) / daysInYear 
         dayDenom = 365 * 2 * 10000; // Half day's rewards
         weekDenom = 365 * 2500; // Full day's rewards plus 6 half day rewards.
     }
 
+    // Event to emit when publishWinningAddress is called. 
     event winnerChosen(address winner, uint winningAmount);
 
     // Generate a random number using current blockchain data and a random input.
     // While miners can influece block.timestamp, block.number, the function is a read function
     // And when we run the function is up to us and fairly random.
-    function generateRandomNumber(
-        uint256 input
-    ) internal view returns (uint256) {
+    function generateRandomNumber(uint256 input) internal view returns (uint256) {
         uint256 randomNumber = uint256(
             keccak256(
                 abi.encodePacked(
@@ -54,6 +57,7 @@ contract CalculateWinners is Metadata {
     }
 
     // Read function to find the winning address and tokenID
+    // This function can be called to simulate a winner draw, but doesn't change state. 
     function findWinningNFTAddress() public view returns (address, uint) {
         uint winningID = calculateWinningNFTId();
         address winner = wintoken.ownerOf(winningID);
@@ -67,7 +71,6 @@ contract CalculateWinners is Metadata {
         uint winningAmount = getWinningAmount();
         // Update state variables
         recordWinningData(winnerAddress, winningAmount);
-
         emit winnerChosen(winnerAddress, winningAmount);
     }
 
@@ -78,12 +81,9 @@ contract CalculateWinners is Metadata {
         uint totalStakingAmount = 0;
         uint nextToken = wintoken.getNextTokenId();
 
-        // Calculate the cumulative staking amounts of users with stakingStatus set to true
+        // Calculate the cumulative staking amounts of users with stakingStatus set to true and stake duration greater than 1 day
         for (uint i = 0; i < nextToken; i++) {
-            if (
-                users[i].stakingStatus &&
-                (block.timestamp - users[i].stakeTimestamp >= 1 days)
-            ) {
+            if (users[i].stakingStatus && (block.timestamp - users[i].stakeTimestamp >= 1 days)) {
                 totalStakingAmount += users[i].stakingAmount;
             }
         }
@@ -91,16 +91,14 @@ contract CalculateWinners is Metadata {
             revert("No valid stakers");
         }
         // Generate a random number within the range of the cumulative staking amounts
-        uint randomNum = generateRandomNumber(totalStakingAmount) %
-            totalStakingAmount;
+        // The random number will fall within the totalStakingAmount
+        uint randomNum = generateRandomNumber(totalStakingAmount) % totalStakingAmount;
 
         // Find the winner by iterating over the users and checking the cumulative staking amounts
+        // Each wei gives the valid staker 1 "entree" into the draw. 
         uint cumulativeAmount = 0;
         for (uint i = 0; i < nextToken; i++) {
-            if (
-                users[i].stakingStatus &&
-                (block.timestamp - users[i].stakeTimestamp >= 1 days)
-            ) {
+            if (users[i].stakingStatus && (block.timestamp - users[i].stakeTimestamp >= 1 days)) {
                 cumulativeAmount += users[i].stakingAmount;
                 if (randomNum <= cumulativeAmount) {
                     return i; // Return the NFT ID of the winner
@@ -135,9 +133,10 @@ contract CalculateWinners is Metadata {
         return (validStakingAmount, totalStakingAmount, totalUnstaking);
     }
 
-    function getValidStakedAmounts() public view returns (uint) {
-        (uint amount, , ) = getTotalStakedAmounts();
-        return amount;
+    // Function to get results from getTotalStakedAmounts. 
+    function getStakedAmounts() public view returns (uint, uint, uint) {
+        (uint valid, uint total , uint unstake ) = getTotalStakedAmounts();
+        return (valid, total, unstake);
     }
 
     // Function to get what the daily winning amount is

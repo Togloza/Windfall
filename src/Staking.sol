@@ -3,18 +3,20 @@ pragma solidity ^0.8.19;
 
 import "./WinToken.sol";
 import "./CalculateWinners.sol";
+import "../node_modules/@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-contract Staking is CalculateWinners {
+contract Staking is CalculateWinners, ReentrancyGuard {
     // Unstake time required by the CANTO network.
     //uint constant UNSTAKE_TIME = 24 days; // 21 days for unstaking on the network, 3 day for admin to unstake
     uint constant UNSTAKE_TIME = 5 minutes;
 
+    // Used for CSR rewards
     Turnstile immutable turnstile;
 
     constructor(address _accessAddress, address _winTokenAddress, uint _turnstileTokenId) CalculateWinners(_accessAddress, _winTokenAddress) {
+        // Initialize turnstile for CSR and assign rewards to factory contract NFT
         turnstile = Turnstile(0xEcf044C5B4b867CFda001101c617eCd347095B44);
         turnstile.assign(_turnstileTokenId);
-
     }
 
     event receivedFunds(address sender, uint _amount);
@@ -22,9 +24,10 @@ contract Staking is CalculateWinners {
     event depositedTokens(uint depositAmount, address sender, uint timestamp);
     event rewardsClaimed(address winnerAddress, uint rewardAmount);
     event startedStaking(address to, uint tokenId, uint timestamp);
+    event tokensWithdrawn(address to, uint amount);
 
     // Staking function, creates new user, set tokenURI and metadata, and mint NFT to sender.
-    function stake() public payable returns (uint) {
+    function stake() public payable nonReentrant returns (uint) {
         require(msg.value > 0, "Staking 0 tokens");
         // Create a new User struct instance
         User memory newUser = User({
@@ -76,28 +79,18 @@ contract Staking is CalculateWinners {
         users[tokenId].stakingStatus = false;
         // Update the metadata to reflect the staking status and emit event.
         updateMetadata(tokenId);
-        emit startedUnstaking(
-            tokenId,
-            users[tokenId].stakingAmount,
-            block.timestamp
-        );
+        emit startedUnstaking(tokenId, users[tokenId].stakingAmount, block.timestamp);
     }
 
     // If isValidUnstake and approved, burn the NFT and send stakingAmount to tokenHolder.
-    function Unstake(uint tokenId) public {
+    function Unstake(uint tokenId) public nonReentrant {
         require(isValidUnstake(tokenId), "Not valid token to unstake");
-        require(
-            wintoken.isApproved(address(this), tokenId),
-            "Contract not approved"
-        );
-        // Find the owner of the token
+        require(wintoken.isApproved(address(this), tokenId),"Contract not approved");
+        // Find the owner of the token and the staking amount.
         address tokenHolder = wintoken.ownerOf(tokenId);
         uint stakingAmount = users[tokenId].stakingAmount;
-
-        require(
-            address(this).balance >= stakingAmount,
-            "Not enough tokens held in contract at the moment"
-        );
+        
+        require(address(this).balance >= stakingAmount, "Not enough tokens held in contract at the moment");
 
         // Burn token and transfer funds.
         wintoken.burn(tokenId);
@@ -131,38 +124,35 @@ contract Staking is CalculateWinners {
         return (totalAmount, block.timestamp); // block.timestamp can be used in the next call of the function
     }
 
+    // Function to check the rewards of a given address.
     function checkRewards() public view returns (uint) {
         return winnerRewards[msg.sender];
     }
 
-    function claimRewards() external {
+    // Allows the user to withdraw their rewards.
+    function claimRewards() external nonReentrant {
         uint userRewards = checkRewards();
         require(userRewards > 0, "No rewards claimable");
+        require(address(this).balance >= userRewards, "Not enough tokens held in contract at the moment");
         // Reset user rewards, send rewards, emit event.
         winnerRewards[msg.sender] = 0;
         payable(msg.sender).transfer(userRewards);
         emit rewardsClaimed(msg.sender, userRewards);
     }
 
-
+    // Function used to retrieve data of past winners for the front end. 
     function retrievePastData() external view returns (address[7] memory, uint[7] memory){
-        // Assume that max of winningAmounts is weekly reward.
         return (winningAddresses, winningAmounts);
     }
 
     // Function to withdraw tokens. Since automatic staking/unstaking to node not currently possible,
     // Have to withdraw the tokens manually before staking.
-    function WithdrawTokens(uint _amount) external {
-        require(
-            access.hasAdminRole(msg.sender) || access.hasSafetyRole(msg.sender),
-            "Wrong Permissions"
-        );
-        require(
-            address(this).balance >= _amount,
-            "Not enough tokens in contract"
-        );
+    function WithdrawTokens(uint _amount) external nonReentrant{
+        require(access.hasAdminRole(msg.sender) || access.hasSafetyRole(msg.sender), "Wrong Permissions");
+        require(address(this).balance >= _amount, "Not enough tokens in contract");
 
         payable(msg.sender).transfer(_amount);
+        emit tokensWithdrawn(msg.sender, _amount);
     }
 
     // Function to deposit tokens into the contract as failsafe.
