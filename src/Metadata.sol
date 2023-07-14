@@ -13,42 +13,9 @@ contract Metadata is Users {
         return metadata[tokenId];
     }
 
-    /*
-    // This function updates the metadata for changes in the user struct. 
-     function updateMetadata(uint tokenId) internal {
-        User memory user = getUserByNFTId(tokenId);
-        string memory imageURL = user.stakingStatus ? "StakingImageURL" : "UnstakingImageURL";
-        // Construct the metadata JSON object
-        metadata[tokenId] = string(
-            abi.encodePacked(
-                "{",
-                '"image": "',
-                imageURL,
-                '",',
-                '"stakingAmount": "',
-                uint256ToString(user.stakingAmount),
-                '",',
-                '"stakingStatus": "',
-                boolToString(user.stakingStatus),
-                '",',
-                '"stakeTimestamp": "',
-                uint256ToString(user.stakeTimestamp),
-                '",',
-                '"unstakeTimestamp": "',
-                uint256ToString(user.unstakeTimestamp),
-                '",',
-                "}"
-            )
-        ); 
-
-    } 
-    */
-
     // Function to construct the attributes string
     // Stack depth error when included in updateMetadata function
-    function constructAttributes(
-        User memory user
-    ) internal pure returns (string memory) {
+    function constructAttributes(User memory user) internal pure returns (string memory) {
         return
             string(
                 abi.encodePacked(
