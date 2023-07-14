@@ -50,6 +50,10 @@ contract WinToken is ERC721, ERC721Burnable {
         _safeMint(to, tokenId);
     }
 
+    function approve(address to, uint256 tokenId) public override {
+        super.approve(to, tokenId);
+    }
+
     function getNextTokenId() public view returns (uint256) {
         return _tokenIdCounter.current();
     }
