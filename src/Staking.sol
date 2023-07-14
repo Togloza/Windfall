@@ -83,7 +83,7 @@ contract Staking is CalculateWinners, ReentrancyGuard {
     }
 
     // If isValidUnstake and approved, burn the NFT and send stakingAmount to tokenHolder.
-    function Unstake(uint tokenId) public nonReentrant {
+    function unstake(uint tokenId) public nonReentrant {
         require(isValidUnstake(tokenId), "Not valid token to unstake");
         require(wintoken.isApproved(address(this), tokenId),"Contract not approved");
         // Find the owner of the token and the staking amount.
@@ -147,7 +147,7 @@ contract Staking is CalculateWinners, ReentrancyGuard {
 
     // Function to withdraw tokens. Since automatic staking/unstaking to node not currently possible,
     // Have to withdraw the tokens manually before staking.
-    function WithdrawTokens(uint _amount) external nonReentrant{
+    function withdrawTokens(uint _amount) external nonReentrant{
         require(access.hasAdminRole(msg.sender) || access.hasSafetyRole(msg.sender), "Wrong Permissions");
         require(address(this).balance >= _amount, "Not enough tokens in contract");
 
@@ -156,7 +156,7 @@ contract Staking is CalculateWinners, ReentrancyGuard {
     }
 
     // Function to deposit tokens into the contract as failsafe.
-    function DepositTokens() external payable {
+    function depositTokens() external payable {
         emit depositedTokens(msg.value, msg.sender, block.timestamp);
     }
 
