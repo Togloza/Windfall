@@ -50,7 +50,6 @@ contract WinToken is ERC721, ERC721Burnable {
         _safeMint(to, tokenId);
     }
 
-
     function getNextTokenId() public view returns (uint256) {
         return _tokenIdCounter.current();
     }
@@ -64,10 +63,10 @@ contract WinToken is ERC721, ERC721Burnable {
         if (tokenOwner[i] == owner) {
             tokenIds[counter] = i;
             counter++;
+            }
         }
-    }
     return tokenIds;
-}
+    }
 
     function exists(uint256 tokenId) external view returns (bool) {
         return super._exists(tokenId);
@@ -87,9 +86,7 @@ contract WinToken is ERC721, ERC721Burnable {
 
     // The following functions are overrides required by Solidity.
 
-    function supportsInterface(
-        bytes4 interfaceId
-    ) public view override(ERC721) returns (bool) {
+    function supportsInterface(bytes4 interfaceId) public view override(ERC721) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 }

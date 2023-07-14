@@ -69,12 +69,10 @@ contract WindfallFactory {
         staking.publishWinningAddress(winnerAddress);
     }
 
-
     event csrWithdrawn(uint csrBalance);
 
- 
     // Withdraw CSR rewards to csrRewardWallet
-    function WithdrawCSR() external payable {
+    function withdrawCSR() external payable {
         require (access.hasAdminRole(msg.sender) || csrRewardWallet == msg.sender, "Restricted Access");
         uint csrBalance = turnstile.balances(turnstileTokenId);
         // Withdraw balance of staking contract CSR if greater than zero, also emit event
@@ -88,7 +86,7 @@ contract WindfallFactory {
     }
 
     // See current CSR rewards unclaimed
-    function CheckCSR() external view returns (uint) {
+    function checkCSR() external view returns (uint) {
         return turnstile.balances(turnstileTokenId);
     }
 }

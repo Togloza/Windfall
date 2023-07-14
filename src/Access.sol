@@ -25,9 +25,7 @@ contract Access is AccessControl {
         return hasRole(SAFETY_ADDRESS, checkSafety);
     }
 
-    function hasPublisherRole(
-        address checkPublisher
-    ) external view returns (bool) {
+    function hasPublisherRole(address checkPublisher) external view returns (bool) {
         return hasRole(PUBLISHER, checkPublisher);
     }
 

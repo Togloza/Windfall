@@ -17,7 +17,6 @@ contract CalculateWinners is Metadata {
     // Updated when winner is published
     uint public winnerTimestamp;
 
-
     // Used for daily and weekly winning amounts.
     uint32 private dayDenom;
     uint32 private weekDenom;
@@ -25,7 +24,6 @@ contract CalculateWinners is Metadata {
     // Variables used for front end past winners.
     uint256[7] internal winningAmounts;
     address[7] internal winningAddresses;
-
 
     constructor(address _accessAddress, address _winTokenAddress) {
         access = Access(_accessAddress);
@@ -105,7 +103,6 @@ contract CalculateWinners is Metadata {
                 }
             }
         }
-
         revert("No winner found"); // This should never happen if there is at least one eligible user
     }
 
@@ -178,8 +175,6 @@ contract CalculateWinners is Metadata {
         winningAddresses[0] = _address;
     }
 
-    
-
     // How long its been since the last draw. Used in random number generator
     // Can be used to automate publishing rewards
     function secondsSinceLastDraw() internal view returns (uint) {
@@ -193,19 +188,13 @@ contract CalculateWinners is Metadata {
 
     // Can be used to change the payout percentage after deployment if neccessary
     function setPayoutPercent(uint32 _payoutPercent) external {
-        require(
-            access.hasAdminRole(msg.sender) || access.hasSafetyRole(msg.sender),
-            "Wrong Permissions"
-        );
+        require(access.hasAdminRole(msg.sender) || access.hasSafetyRole(msg.sender), "Wrong Permissions");
         payoutPercent = _payoutPercent;
     }
 
     // Function to change reward amounts if neccessary.
     function setDenoms(uint32 _dayDenom, uint32 _weekDenom) external {
-        require(
-            access.hasAdminRole(msg.sender) || access.hasSafetyRole(msg.sender),
-            "Wrong Permissions"
-        );
+        require(access.hasAdminRole(msg.sender) || access.hasSafetyRole(msg.sender), "Wrong Permissions");
         dayDenom = _dayDenom;
         weekDenom = _weekDenom;
     }
