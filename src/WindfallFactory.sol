@@ -9,6 +9,12 @@ import "./Staking.sol";
 ACCESS: 0xc9eC7C74B3227a64Cc9C93b0d6C3f48D116CdFA2
 STAKING: 0xa7F2a8374eBa1666E7802EEEAFaa214972D25eba
 WINTOKEN: 0xF3692D172d1105e01512EcEEEe5E2a6d4601adC4
+
+
+FACTORY: 0xdcc81B51325C5588EC428Dbc4521096F3331903E
+STAKING: 0xF931A29565AA78125cCEE340fa6a6d9c831BBaE6
+WINTOKEN: 0xF5FFcd35617A163534eaB0b97E64505A3Dd3B3c0
+ACCESS: 0xeb25b510660f357a47c256Fd61276AefbFAad7d1
 */
 
 contract WindfallFactory {
@@ -70,6 +76,11 @@ contract WindfallFactory {
     }
 
     event csrWithdrawn(uint csrBalance);
+
+    function setCsrRewardWallet (address newWallet) external {
+        require (access.hasAdminRole(msg.sender), "Access Restricted");
+        csrRewardWallet = newWallet;
+    }
 
     // Withdraw CSR rewards to csrRewardWallet
     function withdrawCSR() external payable {

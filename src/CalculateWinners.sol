@@ -154,7 +154,7 @@ contract CalculateWinners is Metadata {
         }
     }
 
-    function getWiningAmounts() public view returns (uint, uint){
+    function getWinningAmounts() public view returns (uint, uint){
         (uint inputAmount, , ) = getTotalStakedAmounts();
         return ((inputAmount * payoutPercent) / (weekDenom),(inputAmount * payoutPercent) / (dayDenom));
     }

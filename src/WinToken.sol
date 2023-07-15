@@ -2,6 +2,7 @@
 pragma solidity ^0.8.19;
 
 import "../node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "../node_modules/@openzeppelin/contracts/utils/Strings.sol";
 import "../node_modules/@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 import "../node_modules/@openzeppelin/contracts/utils/Counters.sol";
 import "./Access.sol";
@@ -14,6 +15,7 @@ interface Turnstile {
 } 
 
 contract WinToken is ERC721, ERC721Burnable {
+    using Strings for uint256;
 
     using Counters for Counters.Counter; // Enumeration of tokens.
     Counters.Counter private _tokenIdCounter;
@@ -33,6 +35,7 @@ contract WinToken is ERC721, ERC721Burnable {
         baseURI = "https://storage.cloud.google.com/windfall-wintoken/windfall-metadata/";
     }
 
+
     function _baseURI() internal view override returns (string memory) {
         return baseURI;
     }
@@ -40,6 +43,13 @@ contract WinToken is ERC721, ERC721Burnable {
     function setBaseURI(string calldata newBaseURI) public {
         require(access.hasAdminRole(msg.sender));
         baseURI = newBaseURI;
+    }
+
+    function tokenURI(uint256 tokenId) public view override returns (string memory) {
+        _requireMinted(tokenId);
+
+        string memory base = _baseURI();
+        return bytes(base).length > 0 ? string(abi.encodePacked(base, tokenId.toString(), ".json")) : "";
     }
     // Mint tokens to "to" address, _safeMint calls _mint which calls _beforeTokenTransfer which updates tokenOwner.
     // Minter role required. 
@@ -59,13 +69,23 @@ contract WinToken is ERC721, ERC721Burnable {
     uint tokenCount = getNextTokenId();
     uint[] memory tokenIds = new uint[](tokenCount);
     uint counter = 0;
+    // Count how many tokens owner owns. 
     for (uint i = 0; i < tokenCount; i++) {
         if (tokenOwner[i] == owner) {
-            tokenIds[counter] = i;
             counter++;
             }
         }
-    return tokenIds;
+        
+    uint[] memory reducedTokenIds = new uint[](counter);
+    uint newCounter = 0;
+    // Store valid values into array
+    for (uint i = 0; i < tokenCount; i++){
+        if (tokenOwner[i] == owner){
+        tokenIds[newCounter] = i;
+        newCounter++;
+        }
+    }
+    return reducedTokenIds;
     }
 
     function exists(uint256 tokenId) external view returns (bool) {
@@ -83,6 +103,7 @@ contract WinToken is ERC721, ERC721Burnable {
         tokenOwner[firstTokenId] = to; 
         super._beforeTokenTransfer(from, to, firstTokenId, 1);
     }
+
 
     // The following functions are overrides required by Solidity.
 

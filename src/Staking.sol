@@ -8,7 +8,7 @@ import "../node_modules/@openzeppelin/contracts/security/ReentrancyGuard.sol";
 contract Staking is CalculateWinners, ReentrancyGuard {
     // Unstake time required by the CANTO network.
     //uint constant UNSTAKE_TIME = 24 days; // 21 days for unstaking on the network, 3 day for admin to unstake
-    uint constant UNSTAKE_TIME = 5 minutes;
+    uint constant UNSTAKE_TIME = 24 days;
 
     // Used for CSR rewards
     Turnstile immutable turnstile;
